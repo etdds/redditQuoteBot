@@ -1,0 +1,1 @@
+# defines custom exceptions for reddit module.

@@ -1,0 +1,1 @@
+# Responsibe for representing a single comment

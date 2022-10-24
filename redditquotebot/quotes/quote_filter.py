@@ -1,0 +1,1 @@
+# Defines a methoods for filtering a quote based on a set of requirements
