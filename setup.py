@@ -10,6 +10,10 @@ with open("README.md", "r") as fh:
         long_description=long_description,
         long_description_content_type="text/markdown",
         packages=setuptools.find_packages(),
+        include_package_data=True,
+        package_data={
+            "redditquotebot": ["data/quotes.csv"]
+        },
         classifiers=[
             "Programming Language :: Python :: 3",
             "Operating System :: OS Independent"
