@@ -7,6 +7,7 @@ class FileTypes(Enum):
     """Defines known filetypes which can be resolved
     """
     JSON = ".json"
+    CSV = ".csv"
 
 
 class FileAssociator():

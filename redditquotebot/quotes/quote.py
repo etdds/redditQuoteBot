@@ -18,7 +18,7 @@ class Quote():
         self.category = category
 
     def __repr__(self):
-        return f"body: {self.body}, authro: {self.author}, category: {', '.join(self.category)}"
+        return f"body: {self.body}, author: {self.author}, category: {', '.join(self.category)}"
 
     def to_dict(self) -> dict:
         """Return the contents of the quote as a dictionary

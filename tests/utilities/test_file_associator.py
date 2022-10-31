@@ -15,6 +15,10 @@ class GettingFileAssociations(unittest.TestCase):
         file_type = self.fa.resolve_file_type("test.json")
         self.assertEqual(file_type, FileTypes.JSON)
 
+    def testCSVFiletype(self):
+        file_type = self.fa.resolve_file_type("test.csv")
+        self.assertEqual(file_type, FileTypes.CSV)
+
     def testUnknownFiletype(self):
         self.assertRaises(LookupError, self.fa.resolve_file_type, "test.unknownextension")
 
