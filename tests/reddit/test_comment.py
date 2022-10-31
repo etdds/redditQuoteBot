@@ -30,3 +30,20 @@ class UsingPrintAccessor(unittest.TestCase):
         self.assertEqual(d["subreddit"], "test")
         self.assertEqual(d["url"], "www")
         self.assertEqual(d["utc"], 12345)
+
+
+class CommentEquality(unittest.TestCase):
+
+    def testEquality(self):
+        comment1 = Comment()
+        comment2 = Comment()
+        comment1.uid = "1234"
+        comment2.uid = "1234"
+        self.assertEqual(comment1, comment2)
+
+    def testNotEquality(self):
+        comment1 = Comment()
+        comment2 = Comment()
+        comment1.uid = "1234"
+        comment2.uid = "12345"
+        self.assertNotEqual(comment1, comment2)

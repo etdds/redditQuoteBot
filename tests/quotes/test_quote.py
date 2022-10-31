@@ -19,3 +19,16 @@ class UsingAccessors(unittest.TestCase):
         self.assertEqual(q["author"], "ben")
         self.assertEqual(q["category"], ["nice"])
         self.assertEqual(q["body"], "body")
+
+
+class TestingEquality(unittest.TestCase):
+
+    def testQuoteIsEqual(self):
+        quote1 = Quote("body", "ben", ["nice"])
+        quote2 = Quote("body", "ben", ["nice"])
+        self.assertEqual(quote1, quote2)
+
+    def testQuoteIsNotEqual(self):
+        quote1 = Quote("body1", "ben", ["nice"])
+        quote2 = Quote("body", "ben", ["nice"])
+        self.assertNotEqual(quote1, quote2)

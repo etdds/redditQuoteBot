@@ -30,3 +30,9 @@ class Comment():
             "edited": self.edited,
             "uid": self.uid,
         }
+
+    def __eq__(self, other):
+        return self.uid == other.uid
+
+    def __ne__(self, other):
+        return self.uid != other.uid
