@@ -11,6 +11,7 @@ class Comment():
         self.url = ""
         self.subreddit = ""
         self.edited = False
+        self.uid = ""
 
     def __repr__(self):
-        return f"Author: {self.author}, utc: {self.utc}, subreddit: {self.subreddit}, edited: {self.edited}, url: {self.url}, body: {self.body}"
+        return f"Author: {self.author}, utc: {self.utc}, subreddit: {self.subreddit}, edited: {self.edited}, url: {self.url}, id: {self.uid}, body: {self.body}"

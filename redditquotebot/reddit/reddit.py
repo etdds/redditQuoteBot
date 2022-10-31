@@ -58,7 +58,8 @@ class Reddit(IReddit):
                 new_comment.utc = comment.created_utc
                 new_comment.edited = comment.edited
                 new_comment.subreddit = comment.subreddit_name_prefixed
-                new_comment.url = comment.permalink
+                new_comment.url = f"https://reddit.com{comment.permalink}"
+                new_comment.uid = comment.id
                 try:
                     new_comment.author = comment.author.name
                 except AttributeError:
