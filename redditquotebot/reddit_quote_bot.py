@@ -1,22 +1,10 @@
-# The 'main' runner
-
-# Setup as a class with a builder to populate all the required configuration field
-
-# Runner would do:
-# Initialise
-# Then
-# Get new comments based on last request time
-# Save last request time
-# Find quotes which best match the each comment
-# Save the pre-selection list for analysis later
-# Build a reply for the best match (above a threshold)
-# Post a reply
-# Repeat
-
+import sys
+from typing import List
 from redditquotebot.reddit import *
 from redditquotebot.utilities import *
 from redditquotebot.quotes import *
-from redditquotebot import QuoteCommentMatcher
+from redditquotebot.nlp import *
+import time
 
 
 class RedditQuoteBot():
@@ -42,42 +30,142 @@ class RedditQuoteBot():
             "handler": RecordStorer.to_json,
             "filepath": ""
         }
+        self.ram_based_records = False
+        self.ram_based_scrape_state = False
         self.reddit = IReddit(self.configuration, self.credentials)
         self.quotes = QuoteDB([])
+        self.quote_matcher = QuoteCommentMatcher()
+        self.quote_threshold = 1.0
 
-    def get_latest_comments(self, subreddit: str) -> List[Comment]:
+    def get_latest_comments(self, subreddit: str, scrape_state: ScrapeState, records: RecordKeeper) -> List[Comment]:
         """Get the latest comments from a given subreddit.
 
         Uses the scrape state and recored keeper files to filter out comments which have already been stored. Only returns and stores new comments.
 
         Args:
             subreddit (str): The subreddit to qurey
+            scrape_state (ScrapeState): Object tracking scrape state
+            records (RecordKeeper): Object for record keeping
 
         Returns:
             List[Comment]: A list of new comment, which have not previously been fetched.
         """
-        scrape_state = self.scrape_state_loader["handler"](self.scrape_state_loader["filepath"])
-        records = self.record_keeper_loader["handler"](self.record_keeper_loader["filepath"])
 
         comments = self.reddit.get_comments(subreddit)
-
         latest_stored_utc = scrape_state.latest_subreddit_utc(subreddit)
         comment_filter = CommentFilter(comments)
         comment_filter.apply(lambda comment: CommentUTCFilter(comment) > latest_stored_utc)
         comment_filter.apply(lambda comment: CommentAuthorFilter(comment) != self.credentials.reddit.username)
-        comment_filter.apply(lambda comment: CommentLengthFilter(comment) >= self.configuration.reddit.minimum_comment_length)
+        comment_filter.apply(lambda comment: CommentEdditedFilter(comment) == False)
+        comment_filter.apply(lambda comment: CommentLengthFilter(comment) >=
+                             self.configuration.reddit.minimum_comment_length)
         filtered_comments = comment_filter.result()
+
         if len(filtered_comments):
             latest_fetched_utc = comment_filter.latest()
-
             records.log_comments(filtered_comments)
-            self.record_keeper_storer["handler"](self.record_keeper_storer["filepath"], records)
-
             scrape_state.update_latest_subreddit_utc(subreddit, latest_fetched_utc)
-            self.scrape_state_storer["handler"](self.scrape_state_storer["filepath"], scrape_state)
         return filtered_comments
+
+    def get_matching_quotes(self, comments: List[Comment], records: RecordKeeper) -> List[List[MatchedQuote]]:
+        """Get matching quotes for a list of comments. Uses internal quote database
+
+        Args:
+            comments (List[Comment]): The list of comments to compare.
+            records (RecordKeeper): Object for record keeping
+
+        Returns:
+            List[MatchedQuote]: A list of matched quotes, each comment may appear up to configuration.reddit.matched_quotes_to_log times.
+        """
+        detector = QuoteDetector(list(self.quotes), comments)
+        detector.apply(self.quote_matcher, self.quote_threshold)
+        matches = []
+
+        # TODO This should be a configuration option.
+        matched_quotes_to_log = 5
+
+        for comment in comments:
+            found = detector.get_matches(comment, matched_quotes_to_log)
+            if len(found):
+                matches.append(found)
+                records.log_matched_quote(found)
+        return matches
+
+    def reply_to_comments(self, matches: List[List[MatchedQuote]], records: RecordKeeper) -> List[Reply]:
+        """Reply to each comment of the best quote match from a list of quotes.
+
+        Args:
+            matches (List[List[MatchedQuote]]): A nested list of comment matches.
+            records (RecordKeeper): Object for record keeping.
+
+        Returns:
+            List[Reply]: List of all replies sent
+        """
+        replies = []
+        for match_list in matches:
+            match = match_list[0]
+            reply = Reply(match.comment, match.quote)
+            replies.append(reply)
+
+        # TODO guard this by configuration, we aren't ready to post yet!
+        # for reply in replies:
+        #     self.reddit.reply_to_comment(reply.comment, reply)
+
+        records.log_reply(replies)
+        return replies
 
     def connect(self):
         """Connect (login) to reddit
         """
         self.reddit.connect()
+
+    def start(self):
+        """Start up the bot!
+        """
+        subreddits = self.configuration.reddit.subreddits
+
+        while (True):
+            try:
+                for subreddit in subreddits:
+                    scrape_state = self._load_scrape_state()
+                    records = self._load_records()
+
+                    new_comments = self.get_latest_comments(subreddit, scrape_state, records)
+                    matches = self.get_matching_quotes(new_comments, records)
+                    self.reply_to_comments(matches, records)
+
+                    self._save_records(records)
+                    self._save_scrape_state(scrape_state)
+                    # TODO the sleep time should be a configuration option.
+                    time.sleep(10)
+            except KeyboardInterrupt:
+                print()
+                sys.exit()
+
+    def _load_scrape_state(self) -> ScrapeState:
+        if not self.ram_based_scrape_state:
+            return self.scrape_state_loader["handler"](self.scrape_state_loader["filepath"])
+        else:
+            try:
+                return self.scrape_state
+            except AttributeError:
+                self.scrape_state = ScrapeState()
+                return self.scrape_state
+
+    def _load_records(self) -> RecordKeeper:
+        if not self.ram_based_records:
+            return self.record_keeper_loader["handler"](self.record_keeper_loader["filepath"])
+        else:
+            try:
+                return self.records
+            except AttributeError:
+                self.records = RecordKeeper()
+                return self.records
+
+    def _save_scrape_state(self, scrape_state: ScrapeState):
+        if not self.ram_based_scrape_state:
+            self.scrape_state_storer["handler"](self.scrape_state_storer["filepath"], scrape_state)
+
+    def _save_records(self, records: RecordKeeper):
+        if not self.ram_based_records:
+            self.record_keeper_storer["handler"](self.record_keeper_storer["filepath"], records)

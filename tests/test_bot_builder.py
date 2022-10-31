@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 from redditquotebot import BotBuilder
+from redditquotebot.nlp import QuoteCommentLengthMatcher
 from redditquotebot.quotes import QuoteDB
 from redditquotebot.utilities import CredentialStore, Configuration
 from redditquotebot.reddit import Reddit
@@ -82,6 +83,16 @@ class SettingUpQuotes(unittest.TestCase):
             self.assertEqual(builder._bot.quotes, quotes)
 
 
+class SettingQuoteMatcher(unittest.TestCase):
+    def test_setting_value(self):
+        builder = BotBuilder()
+        builder.reddit(Reddit)
+        matcher = QuoteCommentLengthMatcher()
+        builder.quote_matcher(matcher, 0.5)
+        self.assertEqual(builder._bot.quote_threshold, 0.5)
+        self.assertEqual(builder._bot.quote_matcher, matcher)
+
+
 class SettingRedditInstance(unittest.TestCase):
     def setUp(self):
         pass
@@ -109,6 +120,13 @@ class SettingRecoredKeeping(unittest.TestCase):
         bot = builder._bot
         self.assertEqual(bot.record_keeper_loader["filepath"], "path/to/file.json")
         self.assertEqual(bot.record_keeper_storer["filepath"], "path/to/file.json")
+        self.assertEqual(bot.ram_based_records, False)
+
+    def testPassingInNone(self):
+        builder = BotBuilder()
+        builder.recored_keeper(None)
+        bot = builder._bot
+        self.assertEqual(bot.ram_based_records, True)
 
 
 class SettingScrapeState(unittest.TestCase):
@@ -119,3 +137,10 @@ class SettingScrapeState(unittest.TestCase):
         bot = builder._bot
         self.assertEqual(bot.scrape_state_loader["filepath"], "path/to/scrape.json")
         self.assertEqual(bot.scrape_state_storer["filepath"], "path/to/scrape.json")
+        self.assertEqual(bot.ram_based_scrape_state, False)
+
+    def testPassingInNone(self):
+        builder = BotBuilder()
+        builder.scrape_state(None)
+        bot = builder._bot
+        self.assertEqual(bot.ram_based_scrape_state, True)
