@@ -12,3 +12,14 @@
 # Build a reply for the best match (above a threshold)
 # Post a reply
 # Repeat
+
+from redditquotebot.utilities import CredentialStore, Configuration
+
+
+class RedditQuoteBot():
+    """A reddit quote bot used for detecting and automatically replying to comments which closely match famous quotes.
+    """
+
+    def __init__(self):
+        self.credentials = CredentialStore()
+        self.configuration = Configuration()
