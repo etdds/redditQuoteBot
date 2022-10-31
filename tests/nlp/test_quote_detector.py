@@ -2,7 +2,8 @@ from nis import match
 import unittest
 from redditquotebot.quotes import Quote
 from redditquotebot.reddit import Comment
-from redditquotebot.nlp import MatchedQuote, QuoteDetector, QuoteCommentLengthMatcher
+from redditquotebot.nlp import MatchedQuote, QuoteDetector, QuoteCommentLengthMatcher, QuoteCommentNLPMatcher, QuoteNLPDetector
+import spacy
 
 
 class MatchingComments(unittest.TestCase):
@@ -26,39 +27,87 @@ class MatchingComments(unittest.TestCase):
             self.comments.append(comment)
             index += 1
 
-        self.detector = QuoteDetector(self.quotes, self.comments)
+        self.detector = QuoteDetector(self.quotes)
 
-    def testGettingCommentsOneMatch(self):
+    def test_getting_comments_one_match(self):
         matcher = QuoteCommentLengthMatcher()
-        self.detector.apply(matcher, 1)
+        self.detector.apply(matcher, 1, self.comments)
         matches = self.detector.get_matches(self.comments[3])
         self.assertEqual(len(matches), 1)
         self.assertEqual(matches[0].quote, self.quotes[3])
 
-    def testGettingCommentsMultiple(self):
+    def test_getting_comments_multiple(self):
         matcher = QuoteCommentLengthMatcher()
-        self.detector.apply(matcher, 1)
+        self.detector.apply(matcher, 1, self.comments)
         matches = self.detector.get_matches(self.comments[2])
         self.assertEqual(len(matches), 2)
         self.assertEqual(matches[0].quote, self.quotes[1])
         self.assertEqual(matches[1].quote, self.quotes[2])
 
-    def testGettingCommentsMultipleLimitedToMaximum(self):
+    def test_getting_comments_multiple_limited_to_maximum(self):
         matcher = QuoteCommentLengthMatcher()
-        self.detector.apply(matcher, 1)
+        self.detector.apply(matcher, 1, self.comments)
         matches = self.detector.get_matches(self.comments[2], 1)
         self.assertEqual(len(matches), 1)
         self.assertEqual(matches[0].quote, self.quotes[1])
 
-    def testGettingCommentsMultipleSorted(self):
+    def test_getting_comments_multiple_sorted(self):
         matcher = QuoteCommentLengthMatcher()
-        self.detector.apply(matcher, 0.5)
+        self.detector.apply(matcher, 0.5, self.comments)
         matches = self.detector.get_matches(self.comments[2])
         self.assertEqual(len(matches), 7)
 
         self.detector.reset()
-        self.detector.apply(matcher, 0.5)
+        self.detector.apply(matcher, 0.5, self.comments)
         matches = self.detector.get_matches(self.comments[2], 2)
         self.assertEqual(len(matches), 2)
         self.assertEqual(matches[0].quote, self.quotes[1])
         self.assertEqual(matches[1].quote, self.quotes[2])
+
+
+class MatchingNLPComments(unittest.TestCase):
+    def setUp(self):
+        self.quotes = [
+            Quote("I has a dream", "", []),
+            Quote("Is this really the end. It looks like it.", "", []),
+        ]
+        comment1 = Comment()
+        comment2 = Comment()
+        comment1.body = "I had a dream"
+        comment2.body = "I don't know"
+        self.comments = [comment1, comment2]
+        self.detector = QuoteNLPDetector(self.quotes)
+
+    def test_getting_a_single_match(self):
+        matcher = QuoteCommentNLPMatcher(0.5, 10)
+        self.detector.apply(matcher, 0.9, self.comments)
+        matches = self.detector.get_matches(self.comments[0])
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0].quote, self.quotes[0])
+
+    def test_sentance_is_cleaned_of_puctuation(self):
+        comment_dirty = Comment()
+        comment_dirty.body = "I has a dream."
+        matcher = QuoteCommentNLPMatcher(0.5, 10)
+        self.detector.apply(matcher, 1.0, [comment_dirty])
+        matches = self.detector.get_matches(comment_dirty)
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0].quote, self.quotes[0])
+
+    def test_multiple_sentences_comment(self):
+        comment = Comment()
+        comment.body = "I woke up. I has a dream. It was great."
+        matcher = QuoteCommentNLPMatcher(0.5, 10)
+        self.detector.apply(matcher, 1.0, [comment])
+        matches = self.detector.get_matches(comment)
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0].quote, self.quotes[0])
+
+    def test_multiple_sentences_quote(self):
+        comment = Comment()
+        comment.body = "It looks like it"
+        matcher = QuoteCommentNLPMatcher(0.5, 10)
+        self.detector.apply(matcher, 1.0, [comment])
+        matches = self.detector.get_matches(comment)
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0].quote, self.quotes[1])

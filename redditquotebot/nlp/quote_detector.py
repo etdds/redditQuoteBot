@@ -1,7 +1,8 @@
 from redditquotebot.reddit import Comment
 from redditquotebot.quotes import Quote
-from redditquotebot.nlp import MatchedQuote, QuoteCommentMatcher
+from redditquotebot.nlp import MatchedQuote, QuoteCommentMatcher, QuoteCommentNLPMatcher
 from typing import List, Optional
+import spacy
 
 
 class QuoteDetector():
@@ -11,24 +12,23 @@ class QuoteDetector():
     Returns the results, up to an optional maximum, sorted from best match to worse.
     """
 
-    def __init__(self, quotes: List[Quote], comments: List[Comment]):
+    def __init__(self, quotes: List[Quote]):
         """
         Args:
             quotes (List[Quote]): List of quotes to use.
-            comments (List[Comment]): List of comments to use.
         """
         self.quotes = quotes
-        self.comments = comments
         self.stored_matches = []
 
-    def apply(self, matcher: QuoteCommentMatcher, score_threshold: float):
+    def apply(self, matcher: QuoteCommentMatcher, score_threshold: float, comments: List[Comment]):
         """Apply a quote comment matcher to the list of quotes and comments.
 
         Args:
             matcher (QuoteCommentMatcher): The matcher to user.
             score_threshold (float): The pass score, of the matcher has a score above this threshold, the comment / quote combination is stored internally.
+            comments (List[Comment]): The list of comments to process
         """
-        for comment in self.comments:
+        for comment in comments:
             for quote in self.quotes:
                 matcher.compare(comment, quote)
                 if matcher.score() >= score_threshold:
@@ -57,3 +57,48 @@ class QuoteDetector():
         """Reset the internal list of matches. Should be used between calls to apply
         """
         self.stored_matches = []
+
+
+class QuoteNLPDetector(QuoteDetector):
+    """Quote detecter which operates with natural language proccessing (NLP) with spacy
+    """
+
+    def __init__(self, quotes: List[Quote]):
+        """
+        Args:
+            quotes (List[Quote]): List of quotes to use.
+        """
+        super().__init__(quotes)
+        self.nlp = spacy.load("en_core_web_lg")
+        self.nlp_quotes = []
+        for q in [self.nlp(q.body) for q in self.quotes]:
+            self.nlp_quotes.append(self._get_sentences(q))
+
+    def _get_sentences(self, body):
+        cleaned_sentences = []
+        sentences = [s for s in body.sents]
+        for sentence in sentences:
+            cleaned_sentences.append(self._remove_puctuation(sentence))
+        return cleaned_sentences
+
+    def _remove_puctuation(self, sentence):
+        cleaned = []
+        for word in sentence:
+            if not word.is_punct:
+                cleaned.append(word)
+        return self.nlp(" ".join([c.text for c in cleaned]))
+
+    def apply(self, matcher: QuoteCommentNLPMatcher, score_threshold: float, comments: List[Comment]):
+        """Apply a NLP based quote comment matcher to the list of quotes and comments.
+
+        Args:
+            matcher (QuoteCommentNLPMatcher): The matcher to user.
+            score_threshold (float): The pass score, of the matcher has a score above this threshold, the comment / quote combination is stored internally.
+            comments (List[Comment]): The list of comments to process
+        """
+        for comment in comments:
+            sentences = self._get_sentences(self.nlp(comment.body))
+            for iq, nlp_quote in enumerate(self.nlp_quotes):
+                matcher.compare(sentences, nlp_quote)
+                if matcher.score() >= score_threshold:
+                    self.stored_matches.append(MatchedQuote(comment, self.quotes[iq], matcher.score()))
