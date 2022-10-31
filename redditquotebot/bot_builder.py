@@ -1,7 +1,7 @@
 from redditquotebot.reddit import IReddit
 from redditquotebot.utilities import *
 from redditquotebot.quotes import QuoteDB, QuoteLoader
-from redditquotebot.nlp import QuoteCommentMatcher
+from redditquotebot.nlp import QuoteCommentMatcher, QuoteDetector
 from redditquotebot import RedditQuoteBot
 from typing import Type, Union, Callable
 
@@ -13,6 +13,8 @@ class BotBuilder():
     def __init__(self):
         self._bot = RedditQuoteBot()
         self._reddit_instance = IReddit
+        self._quotes = QuoteDB([])
+        self._quote_detector_instance = QuoteDetector
 
     def credentials(self, credentials: Union[str, CredentialStore]):
         """Provide the credentials used for the bot.
@@ -98,10 +100,10 @@ class BotBuilder():
                     FileTypes.CSV: QuoteLoader.from_csv
                 }
             )
-            self._bot.quotes = fa.read(quotes)
+            self._quotes = fa.read(quotes)
 
     def quote_matcher(self, matcher: QuoteCommentMatcher, threshold: float):
-        """Prove the matcher used to correlate comments and quotes.
+        """Provide the matcher used to correlate comments and quotes.
 
         Args:
             matcher (QuoteCommentMatcher): A configured matcher to use.
@@ -109,6 +111,14 @@ class BotBuilder():
         """
         self._bot.quote_matcher = matcher
         self._bot.quote_threshold = threshold
+
+    def quote_detector(self, detector: Type[QuoteDetector]):
+        """Provide the quote detector used for quotes
+
+        Args:
+            matcher (QuoteDetector): A configured matcher to use.
+        """
+        self._quote_detector_instance = detector
 
     def bot(self) -> RedditQuoteBot:
         """Get the bot with built specifications
@@ -118,6 +128,7 @@ class BotBuilder():
         """
         # Reinstate the reddit class with the actual derived class specified
         self._bot.reddit = self._reddit_instance(self._bot.configuration, self._bot.credentials)
+        self._bot.quote_detector = self._quote_detector_instance(self._quotes)
 
         # Create the scrape state and record keeper files if needed.
         if not self._bot.ram_based_scrape_state:

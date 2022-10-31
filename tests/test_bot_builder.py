@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 from redditquotebot import BotBuilder
-from redditquotebot.nlp import QuoteCommentLengthMatcher
+from redditquotebot.nlp import QuoteCommentLengthMatcher, QuoteNLPDetector
 from redditquotebot.quotes import QuoteDB
 from redditquotebot.utilities import CredentialStore, Configuration
 from redditquotebot.reddit import Reddit
@@ -80,7 +80,7 @@ class SettingUpQuotes(unittest.TestCase):
             read_mock.return_value = quotes
             builder.quotes("filepath.csv")
             read_mock.assert_called_with("filepath.csv")
-            self.assertEqual(builder._bot.quotes, quotes)
+            self.assertEqual(builder._quotes, quotes)
 
 
 class SettingQuoteMatcher(unittest.TestCase):
@@ -91,6 +91,13 @@ class SettingQuoteMatcher(unittest.TestCase):
         builder.quote_matcher(matcher, 0.5)
         self.assertEqual(builder._bot.quote_threshold, 0.5)
         self.assertEqual(builder._bot.quote_matcher, matcher)
+
+
+class SettingQuoteDetector(unittest.TestCase):
+    def test_detector(self):
+        builder = BotBuilder()
+        builder.quote_detector(QuoteNLPDetector)
+        self.assertEqual(builder._quote_detector_instance, QuoteNLPDetector)
 
 
 class SettingRedditInstance(unittest.TestCase):

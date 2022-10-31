@@ -33,9 +33,9 @@ class RedditQuoteBot():
         self.ram_based_records = False
         self.ram_based_scrape_state = False
         self.reddit = IReddit(self.configuration, self.credentials)
-        self.quotes = QuoteDB([])
         self.quote_matcher = QuoteCommentMatcher()
         self.quote_threshold = 1.0
+        self.detector = QuoteDetector([])
 
     def get_latest_comments(self, subreddit: str, scrape_state: ScrapeState, records: RecordKeeper) -> List[Comment]:
         """Get the latest comments from a given subreddit.
