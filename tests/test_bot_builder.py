@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 from redditquotebot import BotBuilder
+from redditquotebot.quotes import QuoteDB
 from redditquotebot.utilities import CredentialStore, Configuration
 from redditquotebot.reddit import Reddit
 
@@ -55,6 +56,30 @@ class SettingUpConfiguration(unittest.TestCase):
             builder.configuration("filepath.json")
             read_mock.assert_called_with("filepath.json")
             self.assertEqual(builder._bot.configuration, configuration)
+
+
+class SettingUpQuotes(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def testQuotesFromClass(self):
+        quoteDB = QuoteDB([])
+        builder = BotBuilder()
+        builder.quotes(quoteDB)
+        bot = builder._bot
+        self.assertEqual(bot.quotes, quoteDB)
+
+    def testQuotesFromFile(self):
+        builder = BotBuilder()
+        quotes = QuoteDB([])
+        with patch("redditquotebot.utilities.file_associator.FileAssociator.read") as read_mock:
+            read_mock.return_value = quotes
+            builder.quotes("filepath.csv")
+            read_mock.assert_called_with("filepath.csv")
+            self.assertEqual(builder._bot.quotes, quotes)
 
 
 class SettingRedditInstance(unittest.TestCase):

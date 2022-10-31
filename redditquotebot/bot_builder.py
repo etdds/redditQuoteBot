@@ -1,5 +1,6 @@
 from redditquotebot.reddit import IReddit
 from redditquotebot.utilities import *
+from redditquotebot.quotes import QuoteDB, QuoteLoader
 from redditquotebot import RedditQuoteBot
 from typing import Type, Union, Callable
 
@@ -73,6 +74,22 @@ class BotBuilder():
         self._bot.record_keeper_loader["filepath"] = path
         self._bot.record_keeper_storer["handler"] = self._get_record_keeper_storer()
         self._bot.record_keeper_storer["filepath"] = path
+
+    def quotes(self, quotes: Union[str, QuoteDB]):
+        """Provide the path or objcet to the quote database to use
+
+        Args:
+            quotes (Union[str, QuoteDB]): Either a path to file containing the quotes, or a configured quoteDB object
+        """
+        if isinstance(quotes, QuoteDB):
+            self._bot.quotes = quotes
+        else:
+            fa = FileAssociator(
+                {
+                    FileTypes.CSV: QuoteLoader.from_csv
+                }
+            )
+            self._bot.quotes = fa.read(quotes)
 
     def bot(self) -> RedditQuoteBot:
         """Get the bot with built specifications

@@ -6,11 +6,6 @@ from io import StringIO
 class TestQuoteLoadingFromCSV(unittest.TestCase):
 
     def test_well_formatted_csv(self):
-        # scrape_state = ScrapeState()
-        # scrape_state.latest_comments = {
-        #     "test": 12345
-        # }
-
         infile = StringIO()
         infile.write("""quote, author, category
             You know you're in love when you can't fall asleep because reality is finally better than your dreams.,Dr. Seuss,"attributed-no-source, dreams, love, reality, sleep"
