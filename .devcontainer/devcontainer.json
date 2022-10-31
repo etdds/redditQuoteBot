@@ -38,7 +38,8 @@
 				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"vscodevim.vim",
-				"mhutchie.git-graph"
+				"mhutchie.git-graph",
+				"njpwerner.autodocstring"
 			]
 		}
 	},
