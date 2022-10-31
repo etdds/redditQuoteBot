@@ -1,2 +1,32 @@
-# Responsibe for generating the reply body. (Not posting, just producing the text)
-# Takes a comment object, and a quote object
+from redditquotebot.quotes import Quote
+from redditquotebot.reddit import Comment
+
+
+class Reply():
+    def __init__(self, comment: Comment, quote: Quote):
+        self.quote = quote
+        self.comment = comment
+
+    def __repr__(self):
+        return self.body()
+
+    def __str__(self) -> str:
+        return self.body()
+
+    def body(self) -> str:
+        """Get the reply body, generated from the comment and quote
+
+        Returns:
+            str: body of the reply
+        """
+        body = f"""Hi {self.comment.author},
+
+It looks like your comment closely matches the famous quote:
+        
+"{self.quote.body}"
+
+{self.quote.author}
+
+I'm a bot and this action was automatic.
+        """
+        return body
