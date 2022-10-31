@@ -17,6 +17,7 @@ from typing import List
 from redditquotebot.reddit import IReddit, CommentUTCFilter, CommentFilter, Comment, CommentAuthorFilter
 from redditquotebot.utilities import *
 from redditquotebot.quotes import *
+from redditquotebot import QuoteCommentMatcher
 
 
 class RedditQuoteBot():
@@ -44,6 +45,7 @@ class RedditQuoteBot():
         }
         self.reddit = IReddit(self.configuration, self.credentials)
         self.quotes = QuoteDB([])
+        self.matcher = QuoteCommentMatcher()
 
     def get_latest_comments(self, subreddit: str) -> List[Comment]:
         """Get the latest comments from a given subreddit.

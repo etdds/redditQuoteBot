@@ -1,3 +1,18 @@
-# The business logic for matching comments and quotes
+from redditquotebot.reddit import Comment
+from redditquotebot.quotes import Quote
 
-# Takes a list of quotes, a comment and a nlp text processor to return quotes which have a score between 0-1
+
+class QuoteCommentMatcher():
+
+    def __init__(self):
+        self._matches = False
+        self._score = 0
+
+    def compare(self, comment: Comment, quote: Quote):
+        raise NotImplementedError()
+
+    def matches(self) -> bool:
+        return self._matches
+
+    def score(self) -> int:
+        return self._score

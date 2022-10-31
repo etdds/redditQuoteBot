@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from redditquotebot import BotBuilder
+from redditquotebot import BotBuilder, QuoteCommentMatcher
 from redditquotebot.quotes import QuoteDB
 from redditquotebot.utilities import CredentialStore, Configuration
 from redditquotebot.reddit import Reddit
@@ -99,6 +99,18 @@ class SettingRedditInstance(unittest.TestCase):
         builder._bot.scrape_state_loader["handler"] = (lambda _: (_ == _))
         bot = builder.bot()
         self.assertIsInstance(bot.reddit, Reddit)
+
+
+class SettingQuoteMatcher(unittest.TestCase):
+
+    def testPassingClass(self):
+        matcher = QuoteCommentMatcher()
+        builder = BotBuilder()
+        builder.quote_comment_matcher(matcher)
+
+        # Manually override our handlers, so files can be build
+        bot = builder._bot
+        self.assertIsInstance(bot.matcher, matcher)
 
 
 class SettingRecoredKeeping(unittest.TestCase):
