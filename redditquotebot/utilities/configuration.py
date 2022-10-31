@@ -12,7 +12,8 @@ class Configuration():
         self.reddit = SimpleNamespace(
             subreddits=[
                 "test"
-            ]
+            ],
+            new_submissions_per_request=10
         )
 
     def to_dict(self) -> dict:
@@ -20,6 +21,7 @@ class Configuration():
         return {
             "reddit": {
                 "subreddits": self.reddit.subreddits,
+                "new_submissions_per_request": self.reddit.new_submissions_per_request,
             }
         }
 
@@ -44,6 +46,7 @@ class ConfigurationLoader():
         config = Configuration()
         try:
             config.reddit.subreddits = loaded["reddit"]["subreddits"]
+            config.reddit.new_submissions_per_request = loaded["reddit"]["new_submissions_per_request"]
         except KeyError as exp:
             raise KeyError("Cannot load given configuration.") from exp
         return config

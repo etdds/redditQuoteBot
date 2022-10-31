@@ -14,6 +14,7 @@ class LoadingCredentialsFromJson(unittest.TestCase):
     def test_good_configuration(self):
         config = Configuration()
         config.reddit.subreddits = ["test", "me"]
+        config.reddit.new_submissions_per_request = 5
 
         infile = StringIO()
         json.dump(config.to_dict(), infile, indent=2)
@@ -21,6 +22,7 @@ class LoadingCredentialsFromJson(unittest.TestCase):
 
         store = ConfigurationLoader.from_json(infile)
         self.assertEqual(store.reddit.subreddits, ["test", "me"])
+        self.assertEqual(store.reddit.new_submissions_per_request, 5)
 
     def test_bad_keys(self):
         infile = StringIO()
@@ -52,6 +54,7 @@ class SavingCredentialToJson(unittest.TestCase):
     def test_configuration_provided(self):
         config = Configuration()
         config.reddit.subreddits = ["test"]
+        config.reddit.new_submission_per_request = 5
         outfile = StringIO()
         ConfigurationGenerator.to_json(outfile, config)
         outfile.seek(0)

@@ -1,6 +1,8 @@
 
 from redditquotebot.reddit import IReddit, RedditConnectionError
 from redditquotebot.utilities import Configuration, CredentialStore
+from redditquotebot.reddit import Comment
+from typing import List
 import praw
 
 
@@ -16,6 +18,7 @@ class Reddit(IReddit):
             credentials (CredentialStore): Credentials to use for connecting to Reddit.
         """
         super().__init__(configuration, credentials)
+        self._reddit = None
 
     def connect(self):
         """Connect to Reddit
@@ -36,8 +39,30 @@ class Reddit(IReddit):
             raise exp from exp
 
         if self._reddit.user.me() != self.credentials.reddit.username:
-            raise RedditConnectionError("Unexpected username occrred after connecting to Reddit.")
+            raise RedditConnectionError("Unexpected username occurred after connecting to Reddit.")
 
     def disconnect(self):
         # No special handling required
         pass
+
+    def get_comments(self, subreddit: str) -> List[Comment]:
+        subreddit = self._reddit.subreddit(subreddit)
+        comments = []
+
+        count = self.configuration.reddit.new_submissions_per_request
+        for submission in subreddit.new(limit=count):
+            submission.comments.replace_more(limit=None)
+            for comment in submission.comments.list():
+                new_comment = Comment()
+                new_comment.body = comment.body
+                new_comment.utc = comment.created_utc
+                new_comment.edited = comment.edited
+                new_comment.subreddit = comment.subreddit_name_prefixed
+                new_comment.url = comment.permalink
+                try:
+                    new_comment.author = comment.author.name
+                except AttributeError:
+                    new_comment.author = "unknown"
+                comments.append(new_comment)
+
+        return comments

@@ -1,4 +1,6 @@
 from redditquotebot.utilities import Configuration, CredentialStore
+from redditquotebot.reddit import Comment
+from typing import List
 
 
 class IReddit():
@@ -10,4 +12,7 @@ class IReddit():
         raise NotImplementedError()
 
     def disconnect(self):
+        raise NotImplementedError()
+
+    def get_comments(self, subreddit: str) -> List[Comment]:
         raise NotImplementedError()
