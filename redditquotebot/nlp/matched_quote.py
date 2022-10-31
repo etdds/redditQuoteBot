@@ -3,12 +3,26 @@ from redditquotebot.quotes import Quote
 
 
 class MatchedQuote():
+    """Object representing a comment to quote match.
+    """
+
     def __init__(self, comment: Comment, quote: Quote, score: float):
+        """
+        Args:
+            comment (Comment): The comment.
+            quote (Quote): The quote.
+            score (float): The score of the comment to quote match.
+        """
         self.comment = comment
         self.quote = quote
         self.score = score
 
     def to_dict(self) -> dict:
+        """Get the contents of the matched quote as a dictionary
+
+        Returns:
+            dict: Contents as a dictionary.
+        """
         return {
             "comment": self.comment.to_dict(),
             "quote": self.quote.to_dict(),
