@@ -64,6 +64,7 @@ class RedditQuoteBot():
         latest_stored_utc = scrape_state.latest_subreddit_utc(subreddit)
         comment_filter = CommentFilter(comments)
         comment_filter.apply(lambda comment: CommentUTCFilter(comment) > latest_stored_utc)
+        comment_filter.apply(lambda comment: CommentAuthorFilter(comment) != self.credentials.reddit.username)
         filtered_comments = comment_filter.result()
         if len(filtered_comments):
             latest_fetched_utc = comment_filter.latest()
