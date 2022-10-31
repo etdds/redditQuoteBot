@@ -1,6 +1,7 @@
+from redditquotebot.reddit import IReddit
 from redditquotebot.utilities import CredentialLoader, CredentialStore, FileAssociator, FileTypes, Configuration, ConfigurationLoader
 from redditquotebot import RedditQuoteBot
-from typing import Union
+from typing import Type, Union
 
 
 class BotBuilder():
@@ -9,6 +10,7 @@ class BotBuilder():
 
     def __init__(self):
         self._bot = RedditQuoteBot()
+        self._reddit_instance = IReddit
 
     def credentials(self, credentials: Union[str, CredentialStore]):
         """Provide the credentials used for the bot.
@@ -42,10 +44,20 @@ class BotBuilder():
             )
             self._bot.configuration = fa.read(configuration)
 
+    def reddit(self, reddit: Type[IReddit]):
+        """Set the reddit implementation to use.
+
+        Args:
+            reddit (IReddit): Concrete class implementing the IReddit interface.
+        """
+        self._reddit_instance = reddit
+
     def bot(self) -> RedditQuoteBot:
         """Get the bot with built specifications
 
         Returns:
             RedditQuoteBot: The configured bot instance
         """
+        # Reinstate the reddit class with the actual derived class specified
+        self._bot.reddit = self._reddit_instance(self._bot.configuration, self._bot.credentials)
         return self._bot

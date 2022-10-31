@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch
 from redditquotebot import BotBuilder
 from redditquotebot.utilities import CredentialStore, Configuration
+from redditquotebot.reddit import Reddit
 
 
 class SettingUpCredentials(unittest.TestCase):
@@ -54,3 +55,19 @@ class SettingUpConfiguration(unittest.TestCase):
             builder.configuration("filepath.json")
             read_mock.assert_called_with("filepath.json")
             self.assertEqual(builder.bot().configuration, configuration)
+
+
+class SettingRedditInstance(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def testPassingInConcreteInstance(self):
+        configuration = Configuration()
+        configuration.reddit.subreddits = ["subreddit"]
+        builder = BotBuilder()
+        builder.reddit(Reddit)
+        bot = builder.bot()
+        self.assertIsInstance(bot.reddit, Reddit)

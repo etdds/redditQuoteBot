@@ -13,6 +13,7 @@
 # Post a reply
 # Repeat
 
+from redditquotebot.reddit import IReddit
 from redditquotebot.utilities import CredentialStore, Configuration
 
 
@@ -23,3 +24,4 @@ class RedditQuoteBot():
     def __init__(self):
         self.credentials = CredentialStore()
         self.configuration = Configuration()
+        self.reddit = IReddit(self.configuration, self.credentials)
