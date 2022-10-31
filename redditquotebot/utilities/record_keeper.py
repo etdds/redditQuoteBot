@@ -1,6 +1,6 @@
 from io import TextIOWrapper
 from typing import Optional, List, Union
-from redditquotebot.reddit import Comment
+from redditquotebot.reddit import Comment, Reply
 from redditquotebot.nlp import MatchedQuote
 import json
 
@@ -12,7 +12,8 @@ class RecordKeeper():
     def __init__(self):
         self.records = {
             "comments": [],
-            "matches": []
+            "matches": [],
+            "replies": []
         }
 
     def to_dict(self) -> dict:
@@ -70,6 +71,32 @@ class RecordKeeper():
         """
         try:
             return self.records["matches"]
+        except KeyError:
+            return []
+
+    def log_reply(self, reply: Union[List[Reply], Reply]):
+        """Log reply to the record keeper
+
+        Args:
+            reply (Union[List[Reply], Reply]): Either a list of replies, or a single reply
+        """
+        if isinstance(reply, Reply):
+            reply = [reply.to_dict()]
+        else:
+            reply = [r.to_dict() for r in reply]
+        try:
+            self.records["replies"] += reply
+        except KeyError:
+            self.records["replies"] = reply
+
+    def logged_replies(self) -> List[Reply]:
+        """Get all replies currently logged
+
+        Returns:
+            List[Reply]: All logged replies
+        """
+        try:
+            return self.records["replies"]
         except KeyError:
             return []
 

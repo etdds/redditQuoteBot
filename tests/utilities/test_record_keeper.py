@@ -1,6 +1,6 @@
 import unittest
 from io import StringIO
-from redditquotebot.reddit import Comment
+from redditquotebot.reddit import Comment, Reply
 from redditquotebot.utilities import RecordStorer, RecordLoader, RecordKeeper
 from redditquotebot.nlp import MatchedQuote
 from redditquotebot.quotes import Quote
@@ -62,6 +62,34 @@ class UpdatingMatches(unittest.TestCase):
         self.assertEqual(len(records.logged_matches()), 3)
 
 
+class UpdatingReplies(unittest.TestCase):
+
+    def test_fetching_replies_when_not_stored(self):
+        records = RecordKeeper()
+        self.assertEqual(len(records.logged_replies()), 0)
+
+    def test_adding_single_reply(self):
+        reply = Reply(Comment(), Quote("", "", []))
+        records = RecordKeeper()
+        records.log_reply(reply)
+        self.assertEqual(len(records.logged_replies()), 1)
+
+    def test_adding_multiple_replies(self):
+        reply = Reply(Comment(), Quote("", "", []))
+        records = RecordKeeper()
+        records.log_reply([reply, reply])
+        self.assertEqual(len(records.logged_replies()), 2)
+
+    def test_adding_replies_multiple_times(self):
+        records = RecordKeeper()
+        reply = Reply(Comment(), Quote("", "", []))
+        replies = [reply, reply]
+        second_reply = reply
+        records.log_reply(replies)
+        records.log_reply(second_reply)
+        self.assertEqual(len(records.logged_replies()), 3)
+
+
 class GettingDict(unittest.TestCase):
 
     def test_to_dict(self):
@@ -69,6 +97,7 @@ class GettingDict(unittest.TestCase):
         d = records.to_dict()["records"]
         self.assertEqual(len(d["comments"]), 0)
         self.assertEqual(len(d["matches"]), 0)
+        self.assertEqual(len(d["replies"]), 0)
 
 
 class LoadingRecordsFromJSON(unittest.TestCase):

@@ -7,6 +7,13 @@ class Reply():
         self.quote = quote
         self.comment = comment
 
+    def to_dict(self):
+        return {
+            "quote": self.quote.to_dict(),
+            "comment": self.comment.to_dict(),
+            "body": self.body()
+        }
+
     def __repr__(self):
         return self.body()
 
