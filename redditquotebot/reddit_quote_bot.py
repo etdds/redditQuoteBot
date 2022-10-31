@@ -13,8 +13,9 @@
 # Post a reply
 # Repeat
 
-from redditquotebot.reddit import IReddit
-from redditquotebot.utilities import CredentialStore, Configuration
+from typing import List
+from redditquotebot.reddit import IReddit, CommentUTCFilter, CommentFilter, Comment
+from redditquotebot.utilities import *
 
 
 class RedditQuoteBot():
@@ -24,6 +25,55 @@ class RedditQuoteBot():
     def __init__(self):
         self.credentials = CredentialStore()
         self.configuration = Configuration()
-        self.scrape_state_file = ""
-        self.record_keeper_file = ""
+        self.scrape_state_loader = {
+            "handler": ScrapeStateLoader.from_json,
+            "filepath": ""
+        }
+        self.scrape_state_storer = {
+            "handler": ScrapeStateStorer.to_json,
+            "filepath": ""
+        }
+        self.record_keeper_loader = {
+            "handler": RecordLoader.from_json,
+            "filepath": ""
+        }
+        self.record_keeper_storer = {
+            "handler": RecordStorer.to_json,
+            "filepath": ""
+        }
         self.reddit = IReddit(self.configuration, self.credentials)
+
+    def get_latest_comments(self, subreddit: str) -> List[Comment]:
+        """Get the latest comments from a given subreddit.
+
+        Uses the scrape state and recored keeper files to filter out comments which have already been stored. Only returns and stores new comments.
+
+        Args:
+            subreddit (str): The subreddit to qurey
+
+        Returns:
+            List[Comment]: A list of new comment, which have not previously been fetched.
+        """
+        scrape_state = self.scrape_state_loader["handler"](self.scrape_state_loader["filepath"])
+        records = self.record_keeper_loader["handler"](self.record_keeper_loader["filepath"])
+
+        comments = self.reddit.get_comments(subreddit)
+
+        latest_stored_utc = scrape_state.latest_subreddit_utc(subreddit)
+        comment_filter = CommentFilter(comments)
+        comment_filter.apply(lambda comment: CommentUTCFilter(comment) > latest_stored_utc)
+        filtered_comments = comment_filter.result()
+        if len(filtered_comments):
+            latest_fetched_utc = comment_filter.latest()
+
+            records.log_comments(filtered_comments)
+            self.record_keeper_storer["handler"](self.record_keeper_storer["filepath"], records)
+
+            scrape_state.update_latest_subreddit_utc(subreddit, latest_fetched_utc)
+            self.scrape_state_storer["handler"](self.scrape_state_storer["filepath"], scrape_state)
+        return filtered_comments
+
+    def connect(self):
+        """Connect (login) to reddit
+        """
+        self.reddit.connect()
