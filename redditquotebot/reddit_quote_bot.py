@@ -4,7 +4,9 @@ from redditquotebot.reddit import *
 from redditquotebot.utilities import *
 from redditquotebot.quotes import *
 from redditquotebot.nlp import *
-import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RedditQuoteBot():
@@ -124,6 +126,7 @@ class RedditQuoteBot():
         """Start up the bot!
         """
         subreddits = self.configuration.reddit.subreddits
+        logger.info("Start up new bot main loop.")
 
         while (True):
             try:
@@ -131,11 +134,17 @@ class RedditQuoteBot():
                     scrape_state = self._load_scrape_state()
                     records = self._load_records()
 
+                    subreddit_timer = TimeDelta()
                     new_comments = self.get_latest_comments(subreddit, scrape_state, records)
+                    comment_time = round(subreddit_timer.elapsed(), 2)
                     matches = self.get_matching_quotes(new_comments, records)
-                    # TODO Score should be set via configuration.
-                    self.reply_to_comments(matches, 0.98, records)
+                    match_time = round(subreddit_timer.elapsed(), 2)
 
+                    # TODO Score should be set via configuration.
+                    replies = self.reply_to_comments(matches, 0.98, records)
+                    reply_time = round(subreddit_timer.elapsed(), 2)
+                    logger.info(
+                        f"Subreddit {subreddit}: {len(new_comments)} comments in {comment_time}s, {len(matches)} matches in {match_time}s, {len(replies)} replies in {reply_time}s")
                     self._save_records(records)
                     self._save_scrape_state(scrape_state)
             except KeyboardInterrupt:

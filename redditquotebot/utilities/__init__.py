@@ -3,4 +3,5 @@ from .configuration import Configuration, ConfigurationLoader, ConfigurationGene
 from .scrape_state import ScrapeState, ScrapeStateLoader, ScrapeStateStorer
 from .record_keeper import RecordKeeper, RecordLoader, RecordStorer
 from .file_associator import FileAssociator, FileTypes
+from .logger import setup_logger
 from .time_delta import TimeDelta
