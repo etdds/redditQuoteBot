@@ -124,6 +124,16 @@ class CommentFilter():
         """
         return self._comments
 
+    def latest(self) -> int:
+        """Get the latest (greatest) UTC value from the list of comments stored.
+
+        Returns:
+            Comment: Latest comment
+        """
+        if len(self._comments):
+            return max([c.utc for c in self._comments])
+        return 0
+
     def __len__(self):
         return len(self._comments)
 

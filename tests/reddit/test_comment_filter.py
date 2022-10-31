@@ -175,6 +175,8 @@ class TestCommentFilter(unittest.TestCase):
             self.comment_list.append(comment)
 
         self.comment_list[-1].edited = False
+        self.comment_list[0].utc = 1234
+        self.comment_list[1].utc = 9999
 
     def testFilterByAuthor(self):
         comment_filter = CommentFilter(self.comment_list)
@@ -199,3 +201,11 @@ class TestCommentFilter(unittest.TestCase):
         self.assertEqual(comment_filter[0].author, "luke")
         results = comment_filter.result()
         self.assertEqual(results[0].author, "luke")
+
+    def testGetLatestUTC(self):
+        comment_filter = CommentFilter(self.comment_list)
+        self.assertEqual(comment_filter.latest(), 9999)
+
+    def testGetLatestUTCWhenEmpty(self):
+        comment_filter = CommentFilter([])
+        self.assertEqual(comment_filter.latest(), 0)
