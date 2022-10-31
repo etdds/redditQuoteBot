@@ -16,3 +16,29 @@ class QuoteAuthorFilter():
 
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
+
+
+class QuoteLengthFilter():
+    """Filter a quote by the length of its body
+    """
+
+    def __init__(self, quote: Quote):
+        self._quote = quote
+
+    def __gt__(self, other) -> bool:
+        return len(self._quote.body) > other
+
+    def __ge__(self, other) -> bool:
+        return len(self._quote.body) >= other
+
+    def __lt__(self, other) -> bool:
+        return len(self._quote.body) < other
+
+    def __le__(self, other) -> bool:
+        return len(self._quote.body) <= other
+
+    def __eq__(self, other) -> bool:
+        return len(self._quote.body) == other
+
+    def __ne__(self, other) -> bool:
+        return len(self._quote.body) != other
