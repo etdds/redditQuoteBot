@@ -7,3 +7,11 @@ class RedditConnectionError(Exception):
 
     def __init__(self, message):
         super().__init__(message)
+
+
+class RedditReplyError(Exception):
+    """Exception called when posting a reply to reddit failed.
+    """
+
+    def __init__(self, message):
+        super().__init__(message)

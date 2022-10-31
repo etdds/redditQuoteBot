@@ -1,9 +1,10 @@
 
-from redditquotebot.reddit import IReddit, RedditConnectionError
+from redditquotebot.reddit import IReddit, RedditConnectionError, RedditReplyError
 from redditquotebot.utilities import Configuration, CredentialStore
-from redditquotebot.reddit import Comment
+from redditquotebot.reddit import Comment, Reply
 from typing import List
 import praw
+from prawcore.exceptions import Forbidden
 
 
 class Reddit(IReddit):
@@ -46,6 +47,16 @@ class Reddit(IReddit):
         pass
 
     def get_comments(self, subreddit: str) -> List[Comment]:
+        """Get comments from a particular subreddit.
+
+        The ammount of submissions queried is controlled by the configuration.reddit.new_submissions_per_request field.
+
+        Args:
+            subreddit (str): The subreddit to query
+
+        Returns:
+            List[Comment]: The list of comments found
+        """
         subreddit = self._reddit.subreddit(subreddit)
         comments = []
 
@@ -67,3 +78,19 @@ class Reddit(IReddit):
                 comments.append(new_comment)
 
         return comments
+
+    def reply_to_comment(self, comment: Comment, reply: Reply):
+        """Post a reply to a comment.
+
+        Args:
+            comment (Comment): The comment to reply too
+            reply (Reply): The reply to use.
+
+        Raises:
+            RedditReplyError: An error occured when posting the reply.
+        """
+        comment = self._reddit.comment(comment.uid)
+        try:
+            comment.reply(reply.body())
+        except Forbidden as exc:
+            raise RedditReplyError("Cannot post reply, got internal forbidden exception") from exc
