@@ -16,6 +16,17 @@ class GettingAttributes(unittest.TestCase):
         self.assertEqual(match.comment, comment)
         self.assertEqual(match.quote, quote)
 
+    def test_print(self):
+        comment = Comment()
+        comment.author = "ben"
+        quote = Quote("body", "", [])
+        score = 0.5
+        match = MatchedQuote(comment, quote, score)
+        print(match)
+
+
+class DictionaryOperations(unittest.TestCase):
+
     def test_to_dict(self):
         comment = Comment()
         comment.author = "ben"
@@ -27,13 +38,20 @@ class GettingAttributes(unittest.TestCase):
         self.assertEqual(d["comment"]["author"], "ben")
         self.assertEqual(d["quote"]["body"], "body")
 
-    def test_print(self):
+    def test_from_dict(self):
         comment = Comment()
         comment.author = "ben"
         quote = Quote("body", "", [])
         score = 0.5
-        match = MatchedQuote(comment, quote, score)
-        print(match)
+        d = {
+            "comment": comment.to_dict(),
+            "quote": quote.to_dict(),
+            "score": score
+        }
+        match = MatchedQuote.from_dict(d)
+        self.assertEqual(match.comment, comment)
+        self.assertEqual(match.quote, quote)
+        self.assertEqual(match.score, score)
 
 
 class OperatorsOnScore(unittest.TestCase):

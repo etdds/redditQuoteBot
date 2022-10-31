@@ -44,7 +44,7 @@ class RecordKeeper():
             List[Comment]: All logged comments
         """
         try:
-            return self.records["comments"]
+            return [Comment().from_dict(d) for d in self.records["comments"]]
         except KeyError:
             return []
 
@@ -70,7 +70,7 @@ class RecordKeeper():
             List[MatchedQuote]: All logged matches
         """
         try:
-            return self.records["matches"]
+            return [MatchedQuote.from_dict(r) for r in self.records["matches"]]
         except KeyError:
             return []
 
@@ -96,7 +96,7 @@ class RecordKeeper():
             List[Reply]: All logged replies
         """
         try:
-            return self.records["replies"]
+            return [Reply.from_dict(r) for r in self.records["replies"]]
         except KeyError:
             return []
 

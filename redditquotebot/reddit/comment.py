@@ -31,20 +31,22 @@ class Comment():
             "uid": self.uid,
         }
 
-    def from_dict(self, comment_dict: dict):
+    @staticmethod
+    def from_dict(comment_dict: dict):
         """Populate comment contents from a dictionary
 
         Parameters:
             comment_dict (dict): The comment contents as a dictionary
         """
-        self.body = comment_dict["body"]
-        self.utc = comment_dict["utc"]
-        self.author = comment_dict["author"]
-        self.url = comment_dict["url"]
-        self.subreddit = comment_dict["subreddit"]
-        self.edited = comment_dict["edited"]
-        self.uid = comment_dict["uid"]
-        return self
+        comment = Comment()
+        comment.body = comment_dict["body"]
+        comment.utc = comment_dict["utc"]
+        comment.author = comment_dict["author"]
+        comment.url = comment_dict["url"]
+        comment.subreddit = comment_dict["subreddit"]
+        comment.edited = comment_dict["edited"]
+        comment.uid = comment_dict["uid"]
+        return comment
 
     def __eq__(self, other):
         return self.uid == other.uid

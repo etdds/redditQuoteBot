@@ -1,5 +1,6 @@
 import unittest
 from io import StringIO
+from urllib.parse import quote_plus
 from redditquotebot.reddit import Comment, Reply
 from redditquotebot.utilities import RecordStorer, RecordLoader, RecordKeeper
 from redditquotebot.nlp import MatchedQuote
@@ -34,6 +35,21 @@ class UpdatingComments(unittest.TestCase):
         self.assertEqual(len(records.logged_comments()), 3)
 
 
+class RetrievingComments(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.records = RecordKeeper()
+        self.comment = Comment()
+        self.comment.body = "body"
+        self.records.log_comments(self.comment)
+
+    def test_retreive_comment_type_and_contents(self):
+        comments = self.records.logged_comments()
+        self.assertIsInstance(comments, list)
+        self.assertIsInstance(comments[0], Comment)
+        self.assertEqual(comments[0].body, "body")
+
+
 class UpdatingMatches(unittest.TestCase):
 
     def test_fetching_matches_when_not_stored(self):
@@ -62,6 +78,20 @@ class UpdatingMatches(unittest.TestCase):
         self.assertEqual(len(records.logged_matches()), 3)
 
 
+class RetrievingMatches(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.records = RecordKeeper()
+        self.match = MatchedQuote(Comment(), Quote("", "", []), 0.5)
+        self.records.log_matched_quote(self.match)
+
+    def test_retreive_match_type_and_contents(self):
+        matches = self.records.logged_matches()
+        self.assertIsInstance(matches, list)
+        self.assertIsInstance(matches[0], MatchedQuote)
+        self.assertEqual(matches[0].score, 0.5)
+
+
 class UpdatingReplies(unittest.TestCase):
 
     def test_fetching_replies_when_not_stored(self):
@@ -88,6 +118,20 @@ class UpdatingReplies(unittest.TestCase):
         records.log_reply(replies)
         records.log_reply(second_reply)
         self.assertEqual(len(records.logged_replies()), 3)
+
+
+class RetrievingQuotes(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.records = RecordKeeper()
+        self.reply = Reply(Comment(), Quote("body", "", []))
+        self.records.log_reply(self.reply)
+
+    def test_retreive_reply_type_and_contents(self):
+        replies = self.records.logged_replies()
+        self.assertIsInstance(replies, list)
+        self.assertIsInstance(replies[0], Reply)
+        self.assertEqual(replies[0].quote.body, "body")
 
 
 class GettingDict(unittest.TestCase):

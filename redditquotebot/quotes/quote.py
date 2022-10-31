@@ -32,6 +32,18 @@ class Quote():
             "category": self.category
         }
 
+    @staticmethod
+    def from_dict(quote_dict: dict):
+        """Populate quote contents from a dictionary
+
+        Parameters:
+            quote_dict (dict): The quote contents as a dictionary
+        """
+        body = quote_dict["body"]
+        author = quote_dict["author"]
+        category = quote_dict["category"]
+        return Quote(body, author, category)
+
     def __eq__(self, other):
         return self.body == other.body
 

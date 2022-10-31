@@ -29,6 +29,21 @@ class MatchedQuote():
             "score": self.score
         }
 
+    @staticmethod
+    def from_dict(match_dict: dict):
+        """Get the contents of the matched quote from a dictionary
+
+        Parameters:
+            match_dict (dict): The match contents as a dictionary
+
+        Returns:
+            The constructed object.
+        """
+        comment = Comment().from_dict(match_dict["comment"])
+        quote = Quote.from_dict(match_dict["quote"])
+        score = match_dict["score"]
+        return MatchedQuote(comment, quote, score)
+
     def __repr__(self):
         return f"Score: {self.score}, Comment: {self.comment}, Quote: {self.quote}"
 
