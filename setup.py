@@ -15,6 +15,6 @@ with open("README.md", "r") as fh:
             "Operating System :: OS Independent"
         ],
         python_requires='>=3.6',
-        install_requires=[],
+        install_requires=["praw==7.6.0"],
         extras_require={},
     )
