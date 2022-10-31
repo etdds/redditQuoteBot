@@ -31,6 +31,21 @@ class Comment():
             "uid": self.uid,
         }
 
+    def from_dict(self, comment_dict: dict):
+        """Populate comment contents from a dictionary
+
+        Parameters:
+            comment_dict (dict): The comment contents as a dictionary
+        """
+        self.body = comment_dict["body"]
+        self.utc = comment_dict["utc"]
+        self.author = comment_dict["author"]
+        self.url = comment_dict["url"]
+        self.subreddit = comment_dict["subreddit"]
+        self.edited = comment_dict["edited"]
+        self.uid = comment_dict["uid"]
+        return self
+
     def __eq__(self, other):
         return self.uid == other.uid
 
