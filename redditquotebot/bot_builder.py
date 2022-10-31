@@ -93,7 +93,7 @@ class BotBuilder():
             quotes (Union[str, QuoteDB]): Either a path to file containing the quotes, or a configured quoteDB object
         """
         if isinstance(quotes, QuoteDB):
-            self._bot.quotes = quotes
+            self._quotes = quotes
         else:
             fa = FileAssociator(
                 {
@@ -128,7 +128,7 @@ class BotBuilder():
         """
         # Reinstate the reddit class with the actual derived class specified
         self._bot.reddit = self._reddit_instance(self._bot.configuration, self._bot.credentials)
-        self._bot.quote_detector = self._quote_detector_instance(self._quotes)
+        self._bot.detector = self._quote_detector_instance(self._quotes)
 
         # Create the scrape state and record keeper files if needed.
         if not self._bot.ram_based_scrape_state:

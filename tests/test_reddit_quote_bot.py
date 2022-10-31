@@ -2,7 +2,7 @@ from distutils.cmd import Command
 import unittest
 from unittest.mock import patch
 from redditquotebot import BotBuilder
-from redditquotebot.nlp.matched_quote import MatchedQuote
+from redditquotebot.nlp import MatchedQuote, QuoteDetector
 from redditquotebot.reddit import Reddit
 from redditquotebot.utilities import CredentialStore, Configuration, RecordKeeper, ScrapeState
 from redditquotebot import BotBuilder
@@ -40,6 +40,7 @@ class GettingMatchingQuotes(unittest.TestCase):
         builder.scrape_state(None)
         builder.recored_keeper(None)
         builder.quote_matcher(self.matcher, self.threshold)
+        builder.quote_detector(QuoteDetector)
         self.bot = builder.bot()
 
     def tearDown(self):
@@ -87,19 +88,17 @@ class ReplyingToComments(unittest.TestCase):
                 MatchedQuote(comment1, Quote("quote 2", "", []), 0.7),
             ],
             [
-                MatchedQuote(comment2, Quote("quote 2", "", []), 0.8),
+                MatchedQuote(comment2, Quote("quote 2", "", []), 0.9),
                 MatchedQuote(comment2, Quote("quote 1", "", []), 0.7),
             ]
         ]
-        replies = self.bot.reply_to_comments(matches, self.records)
-        self.assertEqual(len(replies), 2)
-        self.assertEqual(len(self.records.logged_replies()), 2)
-        self.assertEqual(replies[0].comment.body, "comment 1")
-        self.assertEqual(replies[0].quote.body, "quote 1")
-        self.assertEqual(replies[1].comment.body, "comment 2")
-        self.assertEqual(replies[1].quote.body, "quote 2")
+        replies = self.bot.reply_to_comments(matches, 0.85,  self.records)
+        self.assertEqual(len(replies), 1)
+        self.assertEqual(len(self.records.logged_replies()), 1)
+        self.assertEqual(replies[0].comment.body, "comment 2")
+        self.assertEqual(replies[0].quote.body, "quote 2")
 
     def test_no_matches_passed(self):
-        replies = self.bot.reply_to_comments([], self.records)
+        replies = self.bot.reply_to_comments([], 0.85, self.records)
         self.assertEqual(len(replies), 0)
         self.assertEqual(len(self.records.logged_replies()), 0)

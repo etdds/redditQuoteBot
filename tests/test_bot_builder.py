@@ -70,8 +70,7 @@ class SettingUpQuotes(unittest.TestCase):
         quoteDB = QuoteDB([])
         builder = BotBuilder()
         builder.quotes(quoteDB)
-        bot = builder._bot
-        self.assertEqual(bot.quotes, quoteDB)
+        self.assertEqual(builder._quotes, quoteDB)
 
     def testQuotesFromFile(self):
         builder = BotBuilder()

@@ -77,25 +77,25 @@ class RedditQuoteBot():
         Returns:
             List[MatchedQuote]: A list of matched quotes, each comment may appear up to configuration.reddit.matched_quotes_to_log times.
         """
-        detector = QuoteDetector(list(self.quotes), comments)
-        detector.apply(self.quote_matcher, self.quote_threshold)
+        self.detector.apply(self.quote_matcher, self.quote_threshold, comments)
         matches = []
 
         # TODO This should be a configuration option.
         matched_quotes_to_log = 5
 
         for comment in comments:
-            found = detector.get_matches(comment, matched_quotes_to_log)
+            found = self.detector.get_matches(comment, matched_quotes_to_log)
             if len(found):
                 matches.append(found)
                 records.log_matched_quote(found)
         return matches
 
-    def reply_to_comments(self, matches: List[List[MatchedQuote]], records: RecordKeeper) -> List[Reply]:
+    def reply_to_comments(self, matches: List[List[MatchedQuote]], threshold: float, records: RecordKeeper) -> List[Reply]:
         """Reply to each comment of the best quote match from a list of quotes.
 
         Args:
             matches (List[List[MatchedQuote]]): A nested list of comment matches.
+            threshold (float): Only matches with a score higher or equal to this number are actually replied to.
             records (RecordKeeper): Object for record keeping.
 
         Returns:
@@ -104,8 +104,9 @@ class RedditQuoteBot():
         replies = []
         for match_list in matches:
             match = match_list[0]
-            reply = Reply(match.comment, match.quote)
-            replies.append(reply)
+            if match.score >= threshold:
+                reply = Reply(match.comment, match.quote)
+                replies.append(reply)
 
         # TODO guard this by configuration, we aren't ready to post yet!
         # for reply in replies:
@@ -132,12 +133,11 @@ class RedditQuoteBot():
 
                     new_comments = self.get_latest_comments(subreddit, scrape_state, records)
                     matches = self.get_matching_quotes(new_comments, records)
-                    self.reply_to_comments(matches, records)
+                    # TODO Score should be set via configuration.
+                    self.reply_to_comments(matches, 0.98, records)
 
                     self._save_records(records)
                     self._save_scrape_state(scrape_state)
-                    # TODO the sleep time should be a configuration option.
-                    time.sleep(10)
             except KeyboardInterrupt:
                 print()
                 sys.exit()
