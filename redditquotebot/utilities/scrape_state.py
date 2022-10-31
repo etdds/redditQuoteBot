@@ -61,6 +61,12 @@ class ScrapeStateStorer():
     """
     @staticmethod
     def to_json(file_handler: TextIOWrapper, scrape_state: Optional[ScrapeState] = None):
+        if isinstance(scrape_state, tuple):
+            if len(scrape_state) != 0:
+                scrape_state = scrape_state[0]
+            else:
+                scrape_state = None
+
         if not scrape_state:
             scrape_state = ScrapeState()
         json.dump(scrape_state.to_dict(), file_handler, indent=2)

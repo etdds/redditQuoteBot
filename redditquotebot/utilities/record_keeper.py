@@ -77,6 +77,12 @@ class RecordStorer():
     """
     @staticmethod
     def to_json(file_handler: TextIOWrapper, records: Optional[RecordKeeper] = None):
+        if isinstance(records, tuple):
+            if len(records) != 0:
+                records = records[0]
+            else:
+                records = None
+
         if not records:
             records = RecordKeeper()
         json.dump(records.to_dict(), file_handler, indent=2)

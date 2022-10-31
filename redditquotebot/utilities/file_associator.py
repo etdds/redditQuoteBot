@@ -59,7 +59,7 @@ class FileAssociator():
             except KeyError as exp:
                 raise KeyError("Not file handler installed for file type.") from exp
 
-    def write(self, path: str):
+    def write(self, path: str, *args):
         """Open a file for writing, and call the registered handler.
 
         Args:
@@ -75,6 +75,6 @@ class FileAssociator():
         file_type = self.resolve_file_type(path)
         with open(path, "w", encoding="utf-8") as file_handler:
             try:
-                return self.associations[file_type](file_handler)
+                return self.associations[file_type](file_handler, args)
             except KeyError as exp:
                 raise KeyError("Not file handler installed for file type.") from exp

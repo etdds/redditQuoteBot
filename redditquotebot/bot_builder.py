@@ -1,7 +1,7 @@
 from redditquotebot.reddit import IReddit
-from redditquotebot.utilities import CredentialLoader, CredentialStore, FileAssociator, FileTypes, Configuration, ConfigurationLoader
+from redditquotebot.utilities import *
 from redditquotebot import RedditQuoteBot
-from typing import Type, Union
+from typing import Type, Union, Callable
 
 
 class BotBuilder():
@@ -58,7 +58,10 @@ class BotBuilder():
         Args:
             path (str): Path to the file
         """
-        self._bot.scrape_state_file = path
+        self._bot.scrape_state_loader["handler"] = self._get_scrape_state_loader()
+        self._bot.scrape_state_loader["filepath"] = path
+        self._bot.scrape_state_storer["handler"] = self._get_scrape_state_storer()
+        self._bot.scrape_state_storer["filepath"] = path
 
     def recored_keeper(self, path: str):
         """Provide the path of the file which keeps a log of comments, replies and matches for the bot
@@ -66,7 +69,10 @@ class BotBuilder():
         Args:
             path (str): Path to the file
         """
-        self._bot.record_keeper_file = path
+        self._bot.record_keeper_loader["handler"] = self._get_record_keeper_loader()
+        self._bot.record_keeper_loader["filepath"] = path
+        self._bot.record_keeper_storer["handler"] = self._get_record_keeper_storer()
+        self._bot.record_keeper_storer["filepath"] = path
 
     def bot(self) -> RedditQuoteBot:
         """Get the bot with built specifications
@@ -76,4 +82,48 @@ class BotBuilder():
         """
         # Reinstate the reddit class with the actual derived class specified
         self._bot.reddit = self._reddit_instance(self._bot.configuration, self._bot.credentials)
+
+        # Create the scrape state and record keeper files if needed.
+        try:
+            self._bot.scrape_state_loader["handler"](self._bot.scrape_state_loader["filepath"])
+        except FileNotFoundError:
+            self._bot.scrape_state_storer["handler"](self._bot.scrape_state_storer["filepath"])
+
+        try:
+            self._bot.record_keeper_loader["handler"](self._bot.record_keeper_loader["filepath"])
+        except FileNotFoundError:
+            self._bot.record_keeper_storer["handler"](self._bot.record_keeper_storer["filepath"])
+
         return self._bot
+
+    def _get_scrape_state_loader(self) -> Callable:
+        fa = FileAssociator(
+            {
+                FileTypes.JSON: ScrapeStateLoader.from_json
+            }
+        )
+        return fa.read
+
+    def _get_scrape_state_storer(self) -> Callable:
+        fa = FileAssociator(
+            {
+                FileTypes.JSON: ScrapeStateStorer.to_json
+            }
+        )
+        return fa.write
+
+    def _get_record_keeper_loader(self) -> Callable:
+        fa = FileAssociator(
+            {
+                FileTypes.JSON: RecordLoader.from_json
+            }
+        )
+        return fa.read
+
+    def _get_record_keeper_storer(self) -> Callable:
+        fa = FileAssociator(
+            {
+                FileTypes.JSON: RecordStorer.to_json
+            }
+        )
+        return fa.write

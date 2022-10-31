@@ -17,7 +17,7 @@ class SettingUpCredentials(unittest.TestCase):
         credentials.reddit.password = "test"
         builder = BotBuilder()
         builder.credentials(credentials)
-        bot = builder.bot()
+        bot = builder._bot
         self.assertEqual(bot.credentials, credentials)
 
     def testSettingCredentialsFromFile(self):
@@ -28,7 +28,7 @@ class SettingUpCredentials(unittest.TestCase):
             read_mock.return_value = credentials
             builder.credentials("filepath.json")
             read_mock.assert_called_with("filepath.json")
-            self.assertEqual(builder.bot().credentials, credentials)
+            self.assertEqual(builder._bot.credentials, credentials)
 
 
 class SettingUpConfiguration(unittest.TestCase):
@@ -43,7 +43,7 @@ class SettingUpConfiguration(unittest.TestCase):
         configuration.reddit.subreddits = ["subreddit"]
         builder = BotBuilder()
         builder.configuration(configuration)
-        bot = builder.bot()
+        bot = builder._bot
         self.assertEqual(bot.configuration, configuration)
 
     def testSettingConfigurationFromFile(self):
@@ -54,7 +54,7 @@ class SettingUpConfiguration(unittest.TestCase):
             read_mock.return_value = configuration
             builder.configuration("filepath.json")
             read_mock.assert_called_with("filepath.json")
-            self.assertEqual(builder.bot().configuration, configuration)
+            self.assertEqual(builder._bot.configuration, configuration)
 
 
 class SettingRedditInstance(unittest.TestCase):
@@ -69,6 +69,9 @@ class SettingRedditInstance(unittest.TestCase):
         configuration.reddit.subreddits = ["subreddit"]
         builder = BotBuilder()
         builder.reddit(Reddit)
+        # Manually override our handlers, so files can be build
+        builder._bot.record_keeper_loader["handler"] = (lambda _: (_ == _))
+        builder._bot.scrape_state_loader["handler"] = (lambda _: (_ == _))
         bot = builder.bot()
         self.assertIsInstance(bot.reddit, Reddit)
 
@@ -77,15 +80,17 @@ class SettingRecoredKeeping(unittest.TestCase):
 
     def testPassingInFile(self):
         builder = BotBuilder()
-        builder.recored_keeper("path/to/file")
-        bot = builder.bot()
-        self.assertEqual(bot.record_keeper_file, "path/to/file")
+        builder.recored_keeper("path/to/file.json")
+        bot = builder._bot
+        self.assertEqual(bot.record_keeper_loader["filepath"], "path/to/file.json")
+        self.assertEqual(bot.record_keeper_storer["filepath"], "path/to/file.json")
 
 
 class SettingScrapeState(unittest.TestCase):
 
     def testPassingInFile(self):
         builder = BotBuilder()
-        builder.scrape_state("path/to/scrape")
-        bot = builder.bot()
-        self.assertEqual(bot.scrape_state_file, "path/to/scrape")
+        builder.scrape_state("path/to/scrape.json")
+        bot = builder._bot
+        self.assertEqual(bot.scrape_state_loader["filepath"], "path/to/scrape.json")
+        self.assertEqual(bot.scrape_state_storer["filepath"], "path/to/scrape.json")

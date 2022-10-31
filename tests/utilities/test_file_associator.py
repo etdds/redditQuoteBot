@@ -27,7 +27,7 @@ class OpenFileHandler(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def fileOpener(self, _):
+    def fileOpener(self, *args):
         self.open_count += 1
 
     def testFileTypeRead(self):
