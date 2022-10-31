@@ -44,7 +44,6 @@ class RedditQuoteBot():
         }
         self.reddit = IReddit(self.configuration, self.credentials)
         self.quotes = QuoteDB([])
-        self.matcher = QuoteCommentMatcher()
 
     def get_latest_comments(self, subreddit: str) -> List[Comment]:
         """Get the latest comments from a given subreddit.

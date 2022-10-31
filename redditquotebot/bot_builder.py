@@ -1,7 +1,7 @@
 from redditquotebot.reddit import IReddit
 from redditquotebot.utilities import *
 from redditquotebot.quotes import QuoteDB, QuoteLoader
-from redditquotebot import RedditQuoteBot, QuoteCommentMatcher
+from redditquotebot import RedditQuoteBot
 from typing import Type, Union, Callable
 
 
@@ -90,9 +90,6 @@ class BotBuilder():
                 }
             )
             self._bot.quotes = fa.read(quotes)
-
-    def quote_comment_matcher(self, matcher: QuoteCommentMatcher):
-        self._bot.matcher = matcher
 
     def bot(self) -> RedditQuoteBot:
         """Get the bot with built specifications
