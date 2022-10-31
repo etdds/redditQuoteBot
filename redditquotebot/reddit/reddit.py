@@ -58,6 +58,7 @@ class Reddit(IReddit):
             List[Comment]: The list of comments found
         """
         subreddit = self._reddit.subreddit(subreddit)
+        max_comments = self.configuration.reddit.max_comments_per_request
         comments = []
 
         count = self.configuration.reddit.new_submissions_per_request
@@ -76,6 +77,8 @@ class Reddit(IReddit):
                 except AttributeError:
                     new_comment.author = "unknown"
                 comments.append(new_comment)
+                if (len(comments) >= max_comments):
+                    return comments
 
         return comments
 

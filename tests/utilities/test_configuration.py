@@ -59,3 +59,21 @@ class SavingCredentialToJson(unittest.TestCase):
         ConfigurationGenerator.to_json(outfile, config)
         outfile.seek(0)
         self.assertEqual(outfile.read(), json.dumps(config.to_dict(), indent=2))
+
+
+class CheckAllCredential(unittest.TestCase):
+
+    def test_all(self):
+        config = Configuration()
+        config.reddit.subreddits = ["test"]
+        config.reddit.new_submissions_per_request = 5
+        config.reddit.max_comments_per_request = 100
+
+        outfile = StringIO()
+        ConfigurationGenerator.to_json(outfile, config)
+        outfile.seek(0)
+        loaded = ConfigurationLoader.from_json(outfile)
+
+        self.assertEqual(loaded.reddit.subreddits, ["test"])
+        self.assertEqual(loaded.reddit.new_submissions_per_request, 5)
+        self.assertEqual(loaded.reddit.max_comments_per_request, 100)
