@@ -52,6 +52,22 @@ class BotBuilder():
         """
         self._reddit_instance = reddit
 
+    def scrape_state(self, path: str):
+        """Provide the path of the file which logs current comment logger (scraper) states.
+
+        Args:
+            path (str): Path to the file
+        """
+        self._bot.scrape_state_file = path
+
+    def recored_keeper(self, path: str):
+        """Provide the path of the file which keeps a log of comments, replies and matches for the bot
+
+        Args:
+            path (str): Path to the file
+        """
+        self._bot.record_keeper_file = path
+
     def bot(self) -> RedditQuoteBot:
         """Get the bot with built specifications
 

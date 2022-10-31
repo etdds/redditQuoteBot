@@ -71,3 +71,21 @@ class SettingRedditInstance(unittest.TestCase):
         builder.reddit(Reddit)
         bot = builder.bot()
         self.assertIsInstance(bot.reddit, Reddit)
+
+
+class SettingRecoredKeeping(unittest.TestCase):
+
+    def testPassingInFile(self):
+        builder = BotBuilder()
+        builder.recored_keeper("path/to/file")
+        bot = builder.bot()
+        self.assertEqual(bot.record_keeper_file, "path/to/file")
+
+
+class SettingScrapeState(unittest.TestCase):
+
+    def testPassingInFile(self):
+        builder = BotBuilder()
+        builder.scrape_state("path/to/scrape")
+        bot = builder.bot()
+        self.assertEqual(bot.scrape_state_file, "path/to/scrape")

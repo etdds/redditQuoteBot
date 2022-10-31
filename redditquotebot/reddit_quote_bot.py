@@ -24,4 +24,6 @@ class RedditQuoteBot():
     def __init__(self):
         self.credentials = CredentialStore()
         self.configuration = Configuration()
+        self.scrape_state_file = ""
+        self.record_keeper_file = ""
         self.reddit = IReddit(self.configuration, self.credentials)
