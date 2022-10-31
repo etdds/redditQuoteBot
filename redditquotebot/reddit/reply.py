@@ -34,6 +34,6 @@ It looks like your comment closely matches the famous quote:
 
 {self.quote.author}
 
-I'm a bot and this action was automatic.
+I'm a bot and this action was automatic. [project source](https://www.google.com)
         """
         return body
