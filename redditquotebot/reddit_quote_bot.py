@@ -13,8 +13,7 @@
 # Post a reply
 # Repeat
 
-from typing import List
-from redditquotebot.reddit import IReddit, CommentUTCFilter, CommentFilter, Comment, CommentAuthorFilter
+from redditquotebot.reddit import *
 from redditquotebot.utilities import *
 from redditquotebot.quotes import *
 from redditquotebot import QuoteCommentMatcher
@@ -67,6 +66,7 @@ class RedditQuoteBot():
         comment_filter = CommentFilter(comments)
         comment_filter.apply(lambda comment: CommentUTCFilter(comment) > latest_stored_utc)
         comment_filter.apply(lambda comment: CommentAuthorFilter(comment) != self.credentials.reddit.username)
+        comment_filter.apply(lambda comment: CommentLengthFilter(comment) >= self.configuration.reddit.minimum_comment_length)
         filtered_comments = comment_filter.result()
         if len(filtered_comments):
             latest_fetched_utc = comment_filter.latest()

@@ -14,7 +14,8 @@ class Configuration():
                 "test"
             ],
             new_submissions_per_request=10,
-            max_comments_per_request=1000
+            max_comments_per_request=1000,
+            minimum_comment_length=15
         )
 
     def to_dict(self) -> dict:
@@ -24,6 +25,7 @@ class Configuration():
                 "subreddits": self.reddit.subreddits,
                 "new_submissions_per_request": self.reddit.new_submissions_per_request,
                 "max_comments_per_request": self.reddit.max_comments_per_request,
+                "minimum_comment_length": self.reddit.minimum_comment_length,
             }
         }
 
@@ -50,6 +52,7 @@ class ConfigurationLoader():
             config.reddit.subreddits = loaded["reddit"]["subreddits"]
             config.reddit.new_submissions_per_request = loaded["reddit"]["new_submissions_per_request"]
             config.reddit.max_comments_per_request = loaded["reddit"]["max_comments_per_request"]
+            config.reddit.minimum_comment_length = loaded["reddit"]["minimum_comment_length"]
         except KeyError as exp:
             raise KeyError("Cannot load given configuration.") from exp
         return config

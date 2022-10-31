@@ -1,5 +1,5 @@
 import unittest
-from redditquotebot.reddit import Comment, CommentAuthorFilter, CommentFilter, CommentUTCFilter, CommentUIDFilter, CommentEdditedFilter
+from redditquotebot.reddit import Comment, CommentAuthorFilter, CommentFilter, CommentUTCFilter, CommentUIDFilter, CommentEdditedFilter, CommentLengthFilter
 
 
 class TestCommentAuthorFilter(unittest.TestCase):
@@ -116,6 +116,33 @@ class TestCommentUTCFilter(unittest.TestCase):
         self.assertEqual(matcher <= comment2, True)
         self.assertEqual(matcher >= comment2, True)
         self.assertEqual(matcher > comment2, False)
+
+
+class TestCommentLengthFilter(unittest.TestCase):
+    def setUp(self):
+        self.comment = Comment()
+        self.comment.body = "1234567890"
+
+    def tearDown(self):
+        pass
+
+    def testCommentLengthEqual(self):
+        self.assertEqual(CommentLengthFilter(self.comment) == 10, True)
+
+    def testCommentLengthNotEqual(self):
+        self.assertEqual(CommentLengthFilter(self.comment) != 8, True)
+
+    def testCommentLengthLessThan(self):
+        self.assertEqual(CommentLengthFilter(self.comment) < 12, True)
+
+    def testCommentLengthLessThanEqual(self):
+        self.assertEqual(CommentLengthFilter(self.comment) <= 10, True)
+
+    def testCommentLengthGreaterThanEqual(self):
+        self.assertEqual(CommentLengthFilter(self.comment) >= 10, True)
+
+    def testCommentLengthGreaterThan(self):
+        self.assertEqual(CommentLengthFilter(self.comment) > 9, True)
 
 
 class TestCommentUIDFilter(unittest.TestCase):

@@ -68,6 +68,7 @@ class CheckAllCredential(unittest.TestCase):
         config.reddit.subreddits = ["test"]
         config.reddit.new_submissions_per_request = 5
         config.reddit.max_comments_per_request = 100
+        config.reddit.minimum_comment_length = 200
 
         outfile = StringIO()
         ConfigurationGenerator.to_json(outfile, config)
@@ -77,3 +78,4 @@ class CheckAllCredential(unittest.TestCase):
         self.assertEqual(loaded.reddit.subreddits, ["test"])
         self.assertEqual(loaded.reddit.new_submissions_per_request, 5)
         self.assertEqual(loaded.reddit.max_comments_per_request, 100)
+        self.assertEqual(loaded.reddit.minimum_comment_length, 200)

@@ -53,6 +53,32 @@ class CommentEdditedFilter():
         return not self.__eq__(other)
 
 
+class CommentLengthFilter():
+    """Filter a comment by the length of its body
+    """
+
+    def __init__(self, comment: Comment):
+        self._comment = comment
+
+    def __gt__(self, other) -> bool:
+        return len(self._comment.body) > other
+
+    def __ge__(self, other) -> bool:
+        return len(self._comment.body) >= other
+
+    def __lt__(self, other) -> bool:
+        return len(self._comment.body) < other
+
+    def __le__(self, other) -> bool:
+        return len(self._comment.body) <= other
+
+    def __eq__(self, other) -> bool:
+        return len(self._comment.body) == other
+
+    def __ne__(self, other) -> bool:
+        return len(self._comment.body) != other
+
+
 class CommentUTCFilter():
     """Filter a comment by UTC time
     """
