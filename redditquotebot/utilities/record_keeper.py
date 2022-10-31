@@ -1,6 +1,7 @@
 from io import TextIOWrapper
 from typing import Optional, List, Union
 from redditquotebot.reddit import Comment
+from redditquotebot.nlp import MatchedQuote
 import json
 
 
@@ -10,20 +11,21 @@ class RecordKeeper():
 
     def __init__(self):
         self.records = {
-            "comments": []
+            "comments": [],
+            "matches": []
         }
 
     def to_dict(self) -> dict:
         """Get the records as a dictionary"""
         return {
-            "records": self.records
+            "records": self.records,
         }
 
     def log_comments(self, comments: Union[List[Comment], Comment]):
         """Log comments to the record keeper
 
         Args:
-            comments (Union[List[Comment], Comment]): _description_
+            comments (Union[List[Comment], Comment]): Either a list of comments or a comment.
         """
         if isinstance(comments, Comment):
             comments = [comments.to_dict()]
@@ -42,6 +44,32 @@ class RecordKeeper():
         """
         try:
             return self.records["comments"]
+        except KeyError:
+            return []
+
+    def log_matched_quote(self, match: Union[List[MatchedQuote], MatchedQuote]):
+        """Log matched quotes to the record keeper
+
+        Args:
+            matches (Union[List[MatchedQuote], MatchedQuote]): Either a list of matches, or a single match
+        """
+        if isinstance(match, MatchedQuote):
+            match = [match.to_dict()]
+        else:
+            match = [m.to_dict() for m in match]
+        try:
+            self.records["matches"] += match
+        except KeyError:
+            self.records["matches"] = match
+
+    def logged_matches(self) -> List[MatchedQuote]:
+        """Get all matches currently logged
+
+        Returns:
+            List[MatchedQuote]: All logged matches
+        """
+        try:
+            return self.records["matches"]
         except KeyError:
             return []
 
