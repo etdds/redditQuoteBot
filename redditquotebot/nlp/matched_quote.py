@@ -3,7 +3,7 @@ from redditquotebot.quotes import Quote
 
 
 class MatchedQuote():
-    def __init__(self, comment: Comment, quote: Quote, score: int):
+    def __init__(self, comment: Comment, quote: Quote, score: float):
         self.comment = comment
         self.quote = quote
         self.score = score
