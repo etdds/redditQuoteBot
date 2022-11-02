@@ -145,8 +145,9 @@ class RedditQuoteBot():
                     reply_time = round(subreddit_timer.elapsed(), 2)
                     logger.info(
                         f"Subreddit {subreddit}: {len(new_comments)} comments in {comment_time}s, {len(matches)} matches in {match_time}s, {len(replies)} replies in {reply_time}s")
-                    self._save_records(records)
-                    self._save_scrape_state(scrape_state)
+                    with DelayedKeyboardInterrupt():
+                        self._save_records(records)
+                        self._save_scrape_state(scrape_state)
             except KeyboardInterrupt:
                 print()
                 sys.exit()
