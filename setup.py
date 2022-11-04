@@ -28,4 +28,6 @@ with open("README.md", "r") as fh:
             "en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.4.1/en_core_web_lg-3.4.1-py3-none-any.whl"
             ],
         extras_require={},
+        use_scm_version=True,
+        setup_requires=["setuptools_scm"]
     )

@@ -8,3 +8,4 @@ credentials.json
 configuration.json
 records.json
 scrape_state.json
+*.eggs
