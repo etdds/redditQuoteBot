@@ -5,6 +5,7 @@ from redditquotebot.utilities import *
 from redditquotebot.quotes import *
 from redditquotebot.nlp import *
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +136,13 @@ class RedditQuoteBot():
                     records = self._load_records()
 
                     subreddit_timer = TimeDelta()
-                    new_comments = self.get_latest_comments(subreddit, scrape_state, records)
+                    try:
+                        new_comments = self.get_latest_comments(subreddit, scrape_state, records)
+                    except Exception as exp:
+                        logger.error(f"Received exception {exp} from Reddit")
+                        time.sleep(30)
+                        continue
+
                     comment_time = round(subreddit_timer.elapsed(), 2)
                     matches = self.get_matching_quotes(new_comments, records)
                     match_time = round(subreddit_timer.elapsed(), 2)
