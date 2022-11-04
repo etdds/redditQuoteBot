@@ -19,6 +19,9 @@ with open("README.md", "r") as fh:
             "Operating System :: OS Independent"
         ],
         python_requires='>=3.6',
+        scripts=[
+            "bin/reddit_quote_bot.py"
+        ],
         install_requires=[
             "praw==7.6.0", 
             "spacy==3.4.2", 

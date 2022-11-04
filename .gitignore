@@ -4,3 +4,7 @@ build/
 *.egg-info
 dist
 *.log
+credentials.json
+configuration.json
+records.json
+scrape_state.json
