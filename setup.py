@@ -23,10 +23,10 @@ with open("README.md", "r") as fh:
             "bin/reddit_quote_bot.py"
         ],
         install_requires=[
-            "praw==7.6.0", 
-            "spacy==3.4.2", 
+            "praw==7.6.0",
+            "spacy==3.4.2",
             "en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.4.1/en_core_web_lg-3.4.1-py3-none-any.whl"
-            ],
+        ],
         extras_require={},
         use_scm_version=True,
         setup_requires=["setuptools_scm"]

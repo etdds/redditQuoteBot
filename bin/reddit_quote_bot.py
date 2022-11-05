@@ -24,7 +24,7 @@ def generate_configuration(path: str):
     full_path = os.path.join(os.getcwd(), path)
     if os.path.exists(full_path):
         print(f"The path {full_path} already exists. Delete this file to replace it if this is what was really intended.")
-        sys.exit()
+        return
     with open(full_path, "w") as handler:
         ConfigurationGenerator.to_json(handler)
 
@@ -33,7 +33,7 @@ def generate_credentials(path: str):
     full_path = os.path.join(os.getcwd(), path)
     if os.path.exists(full_path):
         print(f"The path {full_path} already exists. Delete this file to replace it if this is what was really intended.")
-        sys.exit()
+        return
     with open(full_path, "w") as handler:
         CredentialGenerator.to_json(handler)
 
@@ -59,8 +59,16 @@ if args.generate_config:
 
 timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H:%M:%S")
 builder = BotBuilder()
-builder.configuration(os.path.join(os.getcwd(), conifguration_file_name))
-builder.credentials(os.path.join(os.getcwd(), credentials_file_name))
+
+try:
+    builder.configuration(os.path.join(os.getcwd(), conifguration_file_name))
+    builder.credentials(os.path.join(os.getcwd(), credentials_file_name))
+except FileNotFoundError:
+    generate_configuration(conifguration_file_name)
+    generate_credentials(credentials_file_name)
+    print("Modify and populate credential files in order to configure bot.")
+    sys.exit()
+
 builder.recored_keeper(os.path.join(os.getcwd(), records_file_name))
 builder.scrape_state(os.path.join(os.getcwd(), scrape_state_file_name))
 quote_handler = pkg_resources.open_text(redditquotebot.data, "quotes.csv")
