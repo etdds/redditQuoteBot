@@ -25,7 +25,7 @@ with open("README.md", "r") as fh:
         install_requires=[
             "praw==7.6.0",
             "spacy==3.4.2",
-            "en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.4.1/en_core_web_lg-3.4.1-py3-none-any.whl"
+            "en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.4.1/en_core_web_md-3.4.1-py3-none-any.whl"
         ],
         extras_require={},
         use_scm_version=True,

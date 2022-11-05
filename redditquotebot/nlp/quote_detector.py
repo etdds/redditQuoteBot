@@ -69,7 +69,7 @@ class QuoteNLPDetector(QuoteDetector):
             quotes (List[Quote]): List of quotes to use.
         """
         super().__init__(quotes)
-        self.nlp = spacy.load("en_core_web_lg")
+        self.nlp = spacy.load("en_core_web_md")
         self.nlp_quotes = []
         for q in [self.nlp(q.body) for q in self.quotes]:
             self.nlp_quotes.append(self._get_sentences(q))
