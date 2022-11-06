@@ -20,7 +20,8 @@ with open("README.md", "r") as fh:
         ],
         python_requires='>=3.6',
         scripts=[
-            "bin/reddit_quote_bot.py"
+            "bin/reddit_quote_bot.py",
+            "bin/rqb_record_combine.py",
         ],
         install_requires=[
             "praw==7.6.0",
