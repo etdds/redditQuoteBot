@@ -1,8 +1,8 @@
-from redditquotebot.utilities import RecordKeeper, RecordLoader, RecordStorer
-from redditquotebot.reddit import Comment, Reply, CommentUIDFilter
+from redditquotebot.utilities import RecordKeeper
+from redditquotebot.reddit import Comment
 from redditquotebot.nlp import MatchedQuote, QuoteNLPDetector, QuoteCommentNLPMatcher
 from redditquotebot.quotes import Quote
-from typing import List, Union, Type
+from typing import List, Type
 
 
 def combine_records(records: List[RecordKeeper]) -> RecordKeeper:
@@ -16,20 +16,17 @@ def combine_records(records: List[RecordKeeper]) -> RecordKeeper:
     """
     full_records = RecordKeeper()
     for record in records:
-        full_comments = full_records.logged_comments()
-        full_matches = full_records.logged_matches()
-        full_replies = full_records.logged_replies()
         comments = record.logged_comments()
         for comment in comments:
-            if comment not in full_comments:
+            if comment not in full_records.logged_comments():
                 full_records.log_comments(comment)
         matches = record.logged_matches()
         for match in matches:
-            if match.comment not in [m.comment for m in full_matches]:
+            if match.comment not in [m.comment for m in full_records.logged_matches()]:
                 full_records.log_matched_quote(match)
         replies = record.logged_replies()
         for reply in replies:
-            if reply.comment not in [r.comment for r in full_replies]:
+            if reply.comment not in [r.comment for r in full_records.logged_replies()]:
                 full_records.log_reply(reply)
     return full_records
 
