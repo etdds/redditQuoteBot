@@ -4,7 +4,7 @@ from redditquotebot.reddit import Comment
 from redditquotebot.nlp import QuoteCommentMatcher, QuoteCommentLengthMatcher, QuoteCommentNLPMatcher
 import spacy
 
-nlp = spacy.load("en_core_web_lg")
+nlp = spacy.load("en_core_web_md")
 
 
 class GettingAttributes(unittest.TestCase):
