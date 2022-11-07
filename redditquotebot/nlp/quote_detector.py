@@ -78,15 +78,27 @@ class QuoteNLPDetector(QuoteDetector):
         cleaned_sentences = []
         sentences = [s for s in body.sents]
         for sentence in sentences:
-            cleaned_sentences.append(self._remove_puctuation(sentence))
+            cleaned_sentences.append(self._clean_sentence(sentence))
         return cleaned_sentences
 
-    def _remove_puctuation(self, sentence):
+    def _clean_sentence(self, sentence):
         cleaned = []
         for word in sentence:
-            if not word.is_punct:
+            # Remove proper nouns
+            if word.pos_ == "PROPN":
+                continue
+            # Remove punctuation
+            elif word.is_punct:
+                continue
+            # Remove short words
+            elif len(word) < 2:
+                continue
+            else:
                 cleaned.append(word)
         return self.nlp(" ".join([c.text for c in cleaned]))
+
+    def _get_only_ascii(self, comment: str) -> str:
+        return ''.join([i if (ord(i) < 128) and (ord(i) >= 32) and i != "-" else ' ' for i in comment])
 
     def apply(self, matcher: QuoteCommentNLPMatcher, score_threshold: float, comments: List[Comment]):
         """Apply a NLP based quote comment matcher to the list of quotes and comments.
@@ -97,6 +109,7 @@ class QuoteNLPDetector(QuoteDetector):
             comments (List[Comment]): The list of comments to process
         """
         for comment in comments:
+            comment.body = self._get_only_ascii(comment.body)
             sentences = self._get_sentences(self.nlp(comment.body))
             for iq, nlp_quote in enumerate(self.nlp_quotes):
                 matcher.compare(sentences, nlp_quote)
