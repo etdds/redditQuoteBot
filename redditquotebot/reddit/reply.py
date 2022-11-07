@@ -51,10 +51,7 @@ class Reply():
 
 It looks like your comment closely matches the famous quote:
 
-"{self.quote.body}"
+"{self.quote.body}" - {self.quote.author}
 
-{self.quote.author}
-
-I'm a bot and this action was automatic. [project source](https://www.google.com)
-        """
+*I'm a bot and this action was automatic [Project source](https://github.com/etdds/redditQuoteBot).*"""
         return body
