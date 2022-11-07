@@ -74,8 +74,19 @@ builder.scrape_state(os.path.join(os.getcwd(), scrape_state_file_name))
 quote_handler = pkg_resources.open_text(redditquotebot.data, "quotes.csv")
 quotes = QuoteLoader.from_csv(quote_handler)
 
+config = builder.loaded_configuration()
 builder.quotes(quotes)
-builder.quote_matcher(QuoteCommentNLPMatcher(quote_comment_delta=0.7, minimum_sentence_length=20), 0.97)
+builder.quote_matcher(
+    QuoteCommentNLPMatcher(
+        quote_comment_delta=config.nlp.quote_comment_length_delta,
+        minimum_sentence_word_length=config.nlp.minimum_comment_sentence_word_length,
+        bonus_coeff=config.nlp.quote_length_bonus_coefficient,
+        bonus_start=config.nlp.quote_length_bonus_start,
+        bonus_end=config.nlp.quote_length_bonus_end,
+        match_sentence_coeff=config.nlp.matched_sentence_coefficient
+    ),
+    config.nlp.match_store_threshold
+)
 builder.quote_detector(QuoteNLPDetector)
 builder.reddit(Reddit)
 

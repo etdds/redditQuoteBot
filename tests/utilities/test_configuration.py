@@ -72,6 +72,13 @@ class CheckAllCredential(unittest.TestCase):
         config.bot.reply_to_comments = True
         config.bot.matched_quotes_to_log = 1
         config.bot.reply_threshold = 0.1
+        config.nlp.match_store_threshold = 0.2
+        config.nlp.quote_comment_length_delta = 0.1
+        config.nlp.minimum_comment_sentence_word_length = 2
+        config.nlp.quote_length_bonus_coefficient = 5
+        config.nlp.quote_length_bonus_start = 0
+        config.nlp.quote_length_bonus_end = 20
+        config.nlp.matched_sentence_coefficient = 1
 
         outfile = StringIO()
         ConfigurationGenerator.to_json(outfile, config)
@@ -85,3 +92,10 @@ class CheckAllCredential(unittest.TestCase):
         self.assertEqual(loaded.bot.reply_to_comments, True)
         self.assertEqual(loaded.bot.reply_threshold, 0.1)
         self.assertEqual(loaded.bot.matched_quotes_to_log, 1)
+        self.assertEqual(loaded.nlp.match_store_threshold, 0.2)
+        self.assertEqual(loaded.nlp.quote_comment_length_delta, 0.1)
+        self.assertEqual(loaded.nlp.minimum_comment_sentence_word_length, 2)
+        self.assertEqual(loaded.nlp.quote_length_bonus_coefficient, 5)
+        self.assertEqual(loaded.nlp.quote_length_bonus_start, 0)
+        self.assertEqual(loaded.nlp.quote_length_bonus_end, 20)
+        self.assertEqual(loaded.nlp.matched_sentence_coefficient, 1)
