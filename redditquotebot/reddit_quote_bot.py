@@ -83,8 +83,7 @@ class RedditQuoteBot():
         self.detector.apply(self.quote_matcher, self.quote_threshold, comments)
         matches = []
 
-        # TODO This should be a configuration option.
-        matched_quotes_to_log = 5
+        matched_quotes_to_log = self.configuration.bot.matched_quotes_to_log
 
         for comment in comments:
             found = self.detector.get_matches(comment, matched_quotes_to_log)
@@ -111,9 +110,9 @@ class RedditQuoteBot():
                 reply = Reply(match.comment, match.quote)
                 replies.append(reply)
 
-        # TODO guard this by configuration, we aren't ready to post yet!
-        # for reply in replies:
-        #     self.reddit.reply_to_comment(reply.comment, reply)
+        if self.configuration.bot.reply_to_comments:
+            for reply in replies:
+                self.reddit.reply_to_comment(reply.comment, reply)
 
         records.log_reply(replies)
         return replies
@@ -147,8 +146,8 @@ class RedditQuoteBot():
                     matches = self.get_matching_quotes(new_comments, records)
                     match_time = round(subreddit_timer.elapsed(), 2)
 
-                    # TODO Score should be set via configuration.
-                    replies = self.reply_to_comments(matches, 0.98, records)
+                    threshold = self.configuration.bot.reply_threshold
+                    replies = self.reply_to_comments(matches, threshold, records)
                     reply_time = round(subreddit_timer.elapsed(), 2)
                     logger.info(
                         f"Subreddit {subreddit}: {len(new_comments)} comments in {comment_time}s, {len(matches)} matches in {match_time}s, {len(replies)} replies in {reply_time}s")

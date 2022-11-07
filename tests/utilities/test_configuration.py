@@ -69,6 +69,9 @@ class CheckAllCredential(unittest.TestCase):
         config.reddit.new_submissions_per_request = 5
         config.reddit.max_comments_per_request = 100
         config.reddit.minimum_comment_length = 200
+        config.bot.reply_to_comments = True
+        config.bot.matched_quotes_to_log = 1
+        config.bot.reply_threshold = 0.1
 
         outfile = StringIO()
         ConfigurationGenerator.to_json(outfile, config)
@@ -79,3 +82,6 @@ class CheckAllCredential(unittest.TestCase):
         self.assertEqual(loaded.reddit.new_submissions_per_request, 5)
         self.assertEqual(loaded.reddit.max_comments_per_request, 100)
         self.assertEqual(loaded.reddit.minimum_comment_length, 200)
+        self.assertEqual(loaded.bot.reply_to_comments, True)
+        self.assertEqual(loaded.bot.reply_threshold, 0.1)
+        self.assertEqual(loaded.bot.matched_quotes_to_log, 1)

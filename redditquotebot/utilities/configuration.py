@@ -14,8 +14,13 @@ class Configuration():
                 "test"
             ],
             new_submissions_per_request=10,
-            max_comments_per_request=1000,
+            max_comments_per_request=100,
             minimum_comment_length=15
+        )
+        self.bot = SimpleNamespace(
+            reply_to_comments=False,
+            matched_quotes_to_log=3,
+            reply_threshold=0.99
         )
 
     def to_dict(self) -> dict:
@@ -26,6 +31,11 @@ class Configuration():
                 "new_submissions_per_request": self.reddit.new_submissions_per_request,
                 "max_comments_per_request": self.reddit.max_comments_per_request,
                 "minimum_comment_length": self.reddit.minimum_comment_length,
+            },
+            "bot": {
+                "reply_to_comments": self.bot.reply_to_comments,
+                "reply_threshold": self.bot.reply_threshold,
+                "matched_quotes_to_log": self.bot.matched_quotes_to_log
             }
         }
 
@@ -53,6 +63,9 @@ class ConfigurationLoader():
             config.reddit.new_submissions_per_request = loaded["reddit"]["new_submissions_per_request"]
             config.reddit.max_comments_per_request = loaded["reddit"]["max_comments_per_request"]
             config.reddit.minimum_comment_length = loaded["reddit"]["minimum_comment_length"]
+            config.bot.reply_to_comments = loaded["bot"]["reply_to_comments"]
+            config.bot.reply_threshold = loaded["bot"]["reply_threshold"]
+            config.bot.matched_quotes_to_log = loaded["bot"]["matched_quotes_to_log"]
         except KeyError as exp:
             raise KeyError("Cannot load given configuration.") from exp
         return config
