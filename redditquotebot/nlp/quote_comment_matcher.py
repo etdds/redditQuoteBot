@@ -2,6 +2,8 @@ from redditquotebot.reddit import Comment
 from redditquotebot.quotes import Quote
 from spacy.tokens.doc import Doc
 from typing import List
+from math import floor
+from statistics import mean
 
 
 class QuoteCommentMatcher():
@@ -60,12 +62,29 @@ class QuoteCommentLengthMatcher(QuoteCommentMatcher):
 
 
 class QuoteCommentNLPMatcher(QuoteCommentMatcher):
-    def __init__(self, quote_comment_delta: float, minimum_sentence_word_length: int, bonus_coeff: float = 0.0000, bonus_start: int = 6, bonus_end: int = 10):
+    def __init__(self, quote_comment_delta: float, minimum_sentence_word_length: int, bonus_coeff: float = 0.0000, bonus_start: int = 6, bonus_end: int = 10, match_sentence_coeff: float = 0):
         """A quote comment matches which uses NLP.
+
+        The bonus_coeff, bonus_start and bonus_end is used to apply a bonus to the simularity match of the comment to float, based on the length of the comment.
+        The application is as follows: 
+            bonus_words = quote_word_length - bonus_start
+            bonus_words = bonus_words if bonus_words < bonus_end else bonus_end
+            score *= 1 + (bonus_coeff * bonus_words)
+
+        The match sentence coefficient determins how many sentences of the quote need to match.
+        Applied as follows
+            sentence_count = floor(quote_sentence_count * match_sentence_coeff) + 1
+            i.e: A match_sentence_coeff of 0 will result in 1 sentence, a coefficient of 0.5 for a 4 sentence quote will require 3 of 4 sentences to match
+
+        The mean of the highest sentence_count number of scores is used to determine the final score.
 
         Args:
             quote_comment_delta (float): The maximum difference between the lengths of the comment and quote
             minimum_sentence_word_length (int): The minimum number of words a comment sentence must contain to be used.
+            bonus_coeff (float): The bonus coefficient applied to comments with word counts: bonus_start < count < bonus_end
+            bonus_start (int): The minimum word cound where the bonus is applied
+            bonus_end (int): The maximum word cound where the bonus is applied
+            match_sentenct_coeff (float): The coeffiecient used to determine how many sentences of a quote need to be matched.
         """
         QuoteCommentMatcher.__init__(self)
         self.minimum_sentence_word_length = minimum_sentence_word_length
@@ -73,6 +92,7 @@ class QuoteCommentNLPMatcher(QuoteCommentMatcher):
         self.bonus_start = bonus_start
         self.bonus_end = bonus_end
         self.bonus_coeff = bonus_coeff
+        self.match_sentence_coeff = match_sentence_coeff
 
     def _compared_lengths_similar(self, comment: Doc, quote: Doc) -> bool:
         comment_length = len(comment.text)
@@ -96,7 +116,8 @@ class QuoteCommentNLPMatcher(QuoteCommentMatcher):
         return 1.0 if score > 1.0 else score
 
     def compare(self, comment: List[Doc], quote: List[Doc]):
-        max_score = 0
+        min_matched_sentence = floor(len(quote) * self.match_sentence_coeff) + 1
+        max_scores = [0.0 for _ in range(min_matched_sentence)]
         for csent in comment:
             if not self._minimum_length_met(csent):
                 continue
@@ -106,6 +127,8 @@ class QuoteCommentNLPMatcher(QuoteCommentMatcher):
                 if qsent and qsent.vector_norm and csent and csent.vector_norm:
                     score = qsent.similarity(csent)
                     score = self._apply_length_bonus(qsent, score)
-                    if score > max_score:
-                        max_score = score
-        self._score = 1.0 if max_score > 1.0 else max_score
+                    if score > max_scores[0]:
+                        for i in range(min_matched_sentence - 1):
+                            max_scores[i + 1] = max_scores[i]
+                        max_scores[0] = score
+        self._score = mean(max_scores)

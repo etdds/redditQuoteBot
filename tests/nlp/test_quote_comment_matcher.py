@@ -58,7 +58,7 @@ class TestingQuoteCommentLengthMatcher(unittest.TestCase):
 class TestingQuoteCommenNLPMatcher(unittest.TestCase):
 
     def setUp(self):
-        self.quote = Quote("I had a dream!", "", [])
+        self.quote = Quote("I had a dream! The dream was great.", "", [])
         self.quotes = [
             nlp("I had a dream"),
             nlp("short"),
@@ -118,3 +118,10 @@ class TestingQuoteCommenNLPMatcher(unittest.TestCase):
         matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.0, minimum_sentence_word_length=0)
         matcher.compare(comments, self.quotes[0:1])
         self.assertEqual(matcher.score(), 0)
+
+    def test_multiple_sentence_requirement(self):
+        comments = [nlp("I had a dream"), nlp("Another sentence which doesn't match")]
+        matcher = QuoteCommentNLPMatcher(
+            quote_comment_delta=0.8, minimum_sentence_word_length=3, bonus_coeff=0, match_sentence_coeff=0.5)
+        matcher.compare(comments, self.quotes[0:2])
+        self.assertEqual(matcher.score(),  0.5)
