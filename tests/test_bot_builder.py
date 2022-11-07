@@ -47,6 +47,7 @@ class SettingUpConfiguration(unittest.TestCase):
         builder.configuration(configuration)
         bot = builder._bot
         self.assertEqual(bot.configuration, configuration)
+        self.assertEqual(builder.loaded_configuration(), configuration)
 
     def testSettingConfigurationFromFile(self):
         builder = BotBuilder()

@@ -48,6 +48,16 @@ class BotBuilder():
             )
             self._bot.configuration = fa.read(configuration)
 
+    def loaded_configuration(self) -> Configuration:
+        """Get the instance of the loaded configuration
+
+        The returned value is undefined if the configuration has not already been loaded with self.configuration
+
+         Returns:
+            Configuration: The configuration loaded with self.configuration
+        """
+        return self._bot.configuration
+
     def reddit(self, reddit: Type[IReddit]):
         """Set the reddit implementation to use.
 
