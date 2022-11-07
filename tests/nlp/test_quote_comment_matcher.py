@@ -67,42 +67,42 @@ class TestingQuoteCommenNLPMatcher(unittest.TestCase):
 
     def test_comment_too_short(self):
         comment = [nlp("I")]
-        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0, minimum_sentence_length=2)
+        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0, minimum_sentence_word_length=2)
         matcher.compare(comment, self.quotes[0:1])
         self.assertEqual(matcher.score(), 0)
 
     def test_quote_too_short(self):
         comment = [nlp("I had a dream")]
-        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0, minimum_sentence_length=2)
+        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0, minimum_sentence_word_length=2)
         matcher.compare(comment, self.quotes[2:3])
         self.assertEqual(matcher.score(), 0)
 
     def test_comment_quote_delta_too_large(self):
         comment = [nlp("I had a dream and it went like this")]
-        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.9, minimum_sentence_length=3)
+        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.9, minimum_sentence_word_length=3)
         matcher.compare(comment, self.quotes[0:1])
         self.assertEqual(matcher.score(), 0)
 
     def test_perfect_match(self):
         comments = [nlp("I had a dream"), nlp("Another sentence which doesn't match")]
-        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.9, minimum_sentence_length=3)
+        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.9, minimum_sentence_word_length=3)
         matcher.compare(comments, self.quotes[0:2])
         self.assertEqual(matcher.score(), 1)
 
     def test_almost_perfect_match(self):
         comments = [nlp("I has a dream"), nlp("Another sentence which doesn't match")]
-        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.8, minimum_sentence_length=3)
+        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.8, minimum_sentence_word_length=3)
         matcher.compare(comments, self.quotes[0:2])
         self.assertEqual(matcher.score() > 0.9, True)
 
     def test_empty_quote(self):
         comments = [nlp("I has a dream")]
-        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.0, minimum_sentence_length=0)
+        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.0, minimum_sentence_word_length=0)
         matcher.compare(comments, self.quotes[2:3])
         self.assertEqual(matcher.score(), 0)
 
     def test_empty_comment(self):
         comments = [nlp("")]
-        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.0, minimum_sentence_length=0)
+        matcher = QuoteCommentNLPMatcher(quote_comment_delta=0.0, minimum_sentence_word_length=0)
         matcher.compare(comments, self.quotes[0:1])
         self.assertEqual(matcher.score(), 0)
