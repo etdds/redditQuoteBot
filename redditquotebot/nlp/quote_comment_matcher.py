@@ -60,7 +60,7 @@ class QuoteCommentLengthMatcher(QuoteCommentMatcher):
 
 
 class QuoteCommentNLPMatcher(QuoteCommentMatcher):
-    def __init__(self, quote_comment_delta: float, minimum_sentence_word_length: int):
+    def __init__(self, quote_comment_delta: float, minimum_sentence_word_length: int, bonus_coeff: float = 0.0000, bonus_start: int = 6, bonus_end: int = 10):
         """A quote comment matches which uses NLP.
 
         Args:
@@ -70,6 +70,9 @@ class QuoteCommentNLPMatcher(QuoteCommentMatcher):
         QuoteCommentMatcher.__init__(self)
         self.minimum_sentence_word_length = minimum_sentence_word_length
         self.quote_comment_delta = quote_comment_delta
+        self.bonus_start = bonus_start
+        self.bonus_end = bonus_end
+        self.bonus_coeff = bonus_coeff
 
     def _compared_lengths_similar(self, comment: Doc, quote: Doc) -> bool:
         comment_length = len(comment.text)
@@ -86,6 +89,12 @@ class QuoteCommentNLPMatcher(QuoteCommentMatcher):
     def _word_count(self, sentence: Doc) -> int:
         return len(sentence.text.split(" "))
 
+    def _apply_length_bonus(self, sentence: Doc, score: float) -> float:
+        bonus = (self._word_count(sentence) - self.bonus_start)
+        bonus = self.bonus_end if bonus > self.bonus_end else bonus
+        score *= 1 + bonus * self.bonus_coeff
+        return 1.0 if score > 1.0 else score
+
     def compare(self, comment: List[Doc], quote: List[Doc]):
         max_score = 0
         for csent in comment:
@@ -96,6 +105,7 @@ class QuoteCommentNLPMatcher(QuoteCommentMatcher):
                     continue
                 if qsent and qsent.vector_norm and csent and csent.vector_norm:
                     score = qsent.similarity(csent)
+                    score = self._apply_length_bonus(qsent, score)
                     if score > max_score:
                         max_score = score
         self._score = 1.0 if max_score > 1.0 else max_score

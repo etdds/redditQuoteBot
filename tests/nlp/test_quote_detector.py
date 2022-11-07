@@ -88,7 +88,7 @@ class MatchingNLPComments(unittest.TestCase):
     def test_sentance_is_cleaned_of_puctuation(self):
         comment_dirty = Comment()
         comment_dirty.body = "I has a long dream."
-        matcher = QuoteCommentNLPMatcher(0.5, 2)
+        matcher = QuoteCommentNLPMatcher(0.5, 2, bonus_coeff=0)
         self.detector.apply(matcher, 1.0, [comment_dirty])
         matches = self.detector.get_matches(comment_dirty)
         self.assertEqual(len(matches), 1)
@@ -97,7 +97,7 @@ class MatchingNLPComments(unittest.TestCase):
     def test_sentance_is_cleaned_of_non_ascii(self):
         comment_dirty = Comment()
         comment_dirty.body = "I has a\b \u2019  long dream."
-        matcher = QuoteCommentNLPMatcher(0.5, 2)
+        matcher = QuoteCommentNLPMatcher(0.5, 2, bonus_coeff=0)
         self.detector.apply(matcher, 1.0, [comment_dirty])
         matches = self.detector.get_matches(comment_dirty)
         self.assertEqual(len(matches), 1)
@@ -106,7 +106,7 @@ class MatchingNLPComments(unittest.TestCase):
     def test_sentance_is_cleaned_of_proper_nouns(self):
         comment_dirty = Comment()
         comment_dirty.body = "I has a Ryan Ben London long dream."
-        matcher = QuoteCommentNLPMatcher(0.5, 2)
+        matcher = QuoteCommentNLPMatcher(0.5, 2, bonus_coeff=0)
         self.detector.apply(matcher, 1.0, [comment_dirty])
         matches = self.detector.get_matches(comment_dirty)
         self.assertEqual(len(matches), 1)
@@ -115,7 +115,7 @@ class MatchingNLPComments(unittest.TestCase):
     def test_sentance_short_words_removed(self):
         comment_dirty = Comment()
         comment_dirty.body = "I has a i long dream."
-        matcher = QuoteCommentNLPMatcher(0.5, 2)
+        matcher = QuoteCommentNLPMatcher(0.5, 2, bonus_coeff=0)
         self.detector.apply(matcher, 1.0, [comment_dirty])
         matches = self.detector.get_matches(comment_dirty)
         self.assertEqual(len(matches), 1)
@@ -124,7 +124,7 @@ class MatchingNLPComments(unittest.TestCase):
     def test_sentance_matches_nothing(self):
         comment_dirty = Comment()
         comment_dirty.body = "This sentence doesn't match any quote."
-        matcher = QuoteCommentNLPMatcher(0.5, 2)
+        matcher = QuoteCommentNLPMatcher(0.5, 2, bonus_coeff=0)
         self.detector.apply(matcher, 1.0, [comment_dirty])
         matches = self.detector.get_matches(comment_dirty)
         self.assertEqual(len(matches), 0)
@@ -132,7 +132,7 @@ class MatchingNLPComments(unittest.TestCase):
     def test_multiple_sentences_comment(self):
         comment = Comment()
         comment.body = "I woke up. I has a long dream. It was great."
-        matcher = QuoteCommentNLPMatcher(0.5, 2)
+        matcher = QuoteCommentNLPMatcher(0.5, 2, bonus_coeff=0)
         self.detector.apply(matcher, 1.0, [comment])
         matches = self.detector.get_matches(comment)
         self.assertEqual(len(matches), 1)
@@ -141,7 +141,7 @@ class MatchingNLPComments(unittest.TestCase):
     def test_multiple_sentences_quote(self):
         comment = Comment()
         comment.body = "It looks like it"
-        matcher = QuoteCommentNLPMatcher(0.5, 2)
+        matcher = QuoteCommentNLPMatcher(0.5, 2, bonus_coeff=0)
         self.detector.apply(matcher, 1.0, [comment])
         matches = self.detector.get_matches(comment)
         self.assertEqual(len(matches), 1)
