@@ -102,17 +102,17 @@ class BasicBacktesting(unittest.TestCase):
         self.backtester = Backtester(self.quotes, QuoteDetector)
 
     def test_no_matches(self):
-        self.backtester.set_parameters(self.matcher, 1, 1)
+        self.backtester.set_parameters(self.matcher, 1, 1, False)
         matches = self.backtester.get_matches(self.comments)
         self.assertEqual(len(matches), 0)
 
     def test_one_match(self):
-        self.backtester.set_parameters(self.matcher, 0.8, 1)
+        self.backtester.set_parameters(self.matcher, 0.8, 1, False)
         matches = self.backtester.get_matches(self.comments)
         self.assertEqual(len(matches), 1)
 
     def test_two_matches(self):
-        self.backtester.set_parameters(self.matcher, 0.1, 2)
+        self.backtester.set_parameters(self.matcher, 0.1, 2, False)
         matches = self.backtester.get_matches(self.comments)
         self.assertEqual(len(matches), 1)
         self.assertEqual(len(matches[0]), 2)

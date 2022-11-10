@@ -20,14 +20,17 @@ class QuoteDetector():
         self.quotes = quotes
         self.stored_matches = []
 
-    def apply(self, matcher: QuoteCommentMatcher, score_threshold: float, comments: List[Comment]):
+    def apply(self, matcher: QuoteCommentMatcher, score_threshold: float, filter_author: bool,  comments: List[Comment]):
         """Apply a quote comment matcher to the list of quotes and comments.
 
         Args:
             matcher (QuoteCommentMatcher): The matcher to user.
             score_threshold (float): The pass score, of the matcher has a score above this threshold, the comment / quote combination is stored internally.
+            filter_author (bool): If true, comments which contain the author of the quote are discarded. (Not implemented)
             comments (List[Comment]): The list of comments to process
         """
+        if filter_author is True:
+            raise NotImplementedError("Filter by author is not currently implemented for this quote detector.")
         for comment in comments:
             for quote in self.quotes:
                 matcher.compare(comment, quote)
@@ -98,14 +101,22 @@ class QuoteNLPDetector(QuoteDetector):
         return self.nlp(" ".join([c.text for c in cleaned]))
 
     def _get_only_ascii(self, comment: str) -> str:
-        return ''.join([i if (ord(i) < 128) and (ord(i) >= 32) and i != "-" else ' ' for i in comment])
+        return ''.join([i if (ord(i) < 128) and (ord(i) >= 32) and i not in ["-", ":", "?"] else ' ' for i in comment])
 
-    def apply(self, matcher: QuoteCommentNLPMatcher, score_threshold: float, comments: List[Comment]):
+    def _contains_author(self, body: str, author: str) -> bool:
+        word_list = self._get_only_ascii(body).split(" ")
+        for name in author.split(" "):
+            if len(name) > 2 and name in word_list:
+                return True
+        return False
+
+    def apply(self, matcher: QuoteCommentNLPMatcher, score_threshold: float, filter_author: bool, comments: List[Comment]):
         """Apply a NLP based quote comment matcher to the list of quotes and comments.
 
         Args:
             matcher (QuoteCommentNLPMatcher): The matcher to user.
             score_threshold (float): The pass score, of the matcher has a score above this threshold, the comment / quote combination is stored internally.
+            filter_author (bool): If true, comments which contain the author of the quote are discarded.
             comments (List[Comment]): The list of comments to process
         """
         for comment in comments:
@@ -114,4 +125,5 @@ class QuoteNLPDetector(QuoteDetector):
             for iq, nlp_quote in enumerate(self.nlp_quotes):
                 matcher.compare(sentences, nlp_quote)
                 if matcher.score() >= score_threshold:
-                    self.stored_matches.append(MatchedQuote(comment, self.quotes[iq], matcher.score()))
+                    if not self._contains_author(comment.body, self.quotes[iq].author) or not filter_author:
+                        self.stored_matches.append(MatchedQuote(comment, self.quotes[iq], matcher.score()))

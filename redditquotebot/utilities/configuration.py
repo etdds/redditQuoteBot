@@ -29,7 +29,8 @@ class Configuration():
             quote_length_bonus_coefficient=0.0008,
             quote_length_bonus_start=6,
             quote_length_bonus_end=10,
-            matched_sentence_coefficient=0.5
+            matched_sentence_coefficient=0.5,
+            discard_comments_with_author=True
         )
 
     def to_dict(self) -> dict:
@@ -53,7 +54,8 @@ class Configuration():
                 "quote_length_bonus_coefficient": self.nlp.quote_length_bonus_coefficient,
                 "quote_length_bonus_start": self.nlp.quote_length_bonus_start,
                 "quote_length_bonus_end": self.nlp.quote_length_bonus_end,
-                "matched_sentence_coefficient": self.nlp.matched_sentence_coefficient
+                "matched_sentence_coefficient": self.nlp.matched_sentence_coefficient,
+                "discard_comments_with_author": self.nlp.discard_comments_with_author
             }
         }
 
@@ -91,6 +93,7 @@ class ConfigurationLoader():
             config.nlp.quote_length_bonus_start = loaded["nlp"]["quote_length_bonus_start"]
             config.nlp.quote_length_bonus_end = loaded["nlp"]["quote_length_bonus_end"]
             config.nlp.matched_sentence_coefficient = loaded["nlp"]["matched_sentence_coefficient"]
+            config.nlp.discard_comments_with_author = loaded["nlp"]["discard_comments_with_author"]
         except KeyError as exp:
             raise KeyError("Cannot load given configuration.") from exp
         return config

@@ -18,6 +18,7 @@ class GettingMatchingQuotes(unittest.TestCase):
             "test",
         ]
         configuration.reddit.max_comments_per_request = 100
+        configuration.nlp.discard_comments_with_author = False
         self.records = RecordKeeper()
         self.quotes = QuoteDB([
             Quote("Quote 101", "", []),

@@ -80,7 +80,8 @@ class RedditQuoteBot():
         Returns:
             List[MatchedQuote]: A list of matched quotes, each comment may appear up to configuration.reddit.matched_quotes_to_log times.
         """
-        self.detector.apply(self.quote_matcher, self.quote_threshold, comments)
+        filter_author = self.configuration.nlp.discard_comments_with_author
+        self.detector.apply(self.quote_matcher, self.quote_threshold, filter_author, comments)
         matches = []
 
         matched_quotes_to_log = self.configuration.bot.matched_quotes_to_log

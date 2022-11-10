@@ -40,9 +40,10 @@ class Backtester():
         self._matcher = QuoteCommentNLPMatcher(0, 0)
         self._threshold = 0.5
         self._store_count = 1
+        self._filter_author = False
 
     def _worker(self, comments: List[Comment]):
-        self.detector.apply(self._matcher, self._threshold, comments)
+        self.detector.apply(self._matcher, self._threshold, self._filter_author, comments)
         all_matches = []
         for comment in comments:
             matches = self.detector.get_matches(comment, self._store_count)
@@ -61,14 +62,16 @@ class Backtester():
         """
         return self._worker(comments)
 
-    def set_parameters(self, matcher: QuoteCommentNLPMatcher, threshold: float, store_count: int):
+    def set_parameters(self, matcher: QuoteCommentNLPMatcher, threshold: float, store_count: int, filter_author: bool):
         """Set the parameters used for get_matches
 
         Args:
             matcher (QuoteCommentNLPMatcher): The quote comment matcher to use
             threshold (float): The threshold to use for accepting that a quote matches a comment
             store_count (int): The number of matches to store for a single comment.
+            filter_author (bool): If True, comments which contain the quote's author are ignored.
         """
         self._matcher = matcher
         self._store_count = store_count
         self._threshold = threshold
+        self._filter_author = filter_author

@@ -90,7 +90,8 @@ The configuration file `configuration.json` is created the first time is run, an
     "quote_length_bonus_coefficient": 0.0008,
     "quote_length_bonus_start": 6,
     "quote_length_bonus_end": 10,
-    "matched_sentence_coefficient": 0.5
+    "matched_sentence_coefficient": 0.5,
+    "discard_comments_with_author": true
   }
 }
 ```
@@ -109,6 +110,7 @@ The configuration file `configuration.json` is created the first time is run, an
 |               | quote_length_bonus_coefficient        |  The coefficient applied per word to the NLP score for comment quote sentences matches when they longer than `quote_length_bonus_start` |
 |               | quote_length_bonus_start              |  The starting quote sentence length needed for the NLP score bonus to be applied. |
 |               | quote_length_bonus_end                |  The maximum quote sentence length to which a bonus NLP score is applied. |
+|               | discard_comments_with_author          |  Define if comments should be matched to quotes when the body of the comment contains the author of the quote |
 
 ### Credentials
 
