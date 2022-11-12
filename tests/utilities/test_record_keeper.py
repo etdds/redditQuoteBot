@@ -34,6 +34,37 @@ class UpdatingComments(unittest.TestCase):
         records.log_comments(seconds_comment)
         self.assertEqual(len(records.logged_comments()), 3)
 
+    def test_adding_comments_no_comment_limit(self):
+        records = RecordKeeper()
+        comments = [Comment(), Comment(), Comment(), Comment()]
+        records.log_comments(comments)
+        records.log_comments(comments)
+        self.assertEqual(len(records.logged_comments()), 8)
+
+    def test_adding_comments_with_comment_limit(self):
+        records = RecordKeeper()
+        records.maximum_comments(3)
+        comments = [Comment(), Comment(), Comment(), Comment()]
+        records.log_comments(comments)
+        records.log_comments(comments)
+        self.assertEqual(len(records.logged_comments()), 3)
+
+    def test_adding_comments_with_no_comments_allowed(self):
+        records = RecordKeeper()
+        records.maximum_comments(0)
+        comments = [Comment(), Comment(), Comment(), Comment()]
+        records.log_comments(comments)
+        records.log_comments(comments)
+        self.assertEqual(len(records.logged_comments()), 0)
+
+    def test_adding_comments_capping_limit(self):
+        records = RecordKeeper()
+        comments = [Comment(), Comment(), Comment(), Comment()]
+        records.log_comments(comments)
+        records.log_comments(comments)
+        records.maximum_comments(2)
+        self.assertEqual(len(records.logged_comments()), 2)
+
 
 class RetrievingComments(unittest.TestCase):
 
@@ -77,6 +108,40 @@ class UpdatingMatches(unittest.TestCase):
         records.log_matched_quote(seconds_match)
         self.assertEqual(len(records.logged_matches()), 3)
 
+    def test_adding_matches_mo_match_limit(self):
+        records = RecordKeeper()
+        match = MatchedQuote(Comment(), Quote("", "", []), 0.5)
+        matches = [match, match, match, match]
+        records.log_matched_quote(matches)
+        records.log_matched_quote(matches)
+        self.assertEqual(len(records.logged_matches()), 8)
+
+    def test_adding_matches_with_match_limit(self):
+        records = RecordKeeper()
+        records.maximum_matches(3)
+        match = MatchedQuote(Comment(), Quote("", "", []), 0.5)
+        matches = [match, match, match, match]
+        records.log_matched_quote(matches)
+        records.log_matched_quote(matches)
+        self.assertEqual(len(records.logged_matches()), 3)
+
+    def test_adding_matches_with_no_matches_allowed(self):
+        records = RecordKeeper()
+        records.maximum_matches(0)
+        match = MatchedQuote(Comment(), Quote("", "", []), 0.5)
+        matches = [match, match, match, match]
+        records.log_matched_quote(matches)
+        records.log_matched_quote(matches)
+        self.assertEqual(len(records.logged_matches()), 0)
+
+    def test_adding_matches_capping_limit(self):
+        records = RecordKeeper()
+        match = MatchedQuote(Comment(), Quote("", "", []), 0.5)
+        matches = [match, match, match, match]
+        records.log_matched_quote(matches)
+        records.maximum_matches(2)
+        self.assertEqual(len(records.logged_matches()), 2)
+
 
 class RetrievingMatches(unittest.TestCase):
 
@@ -119,6 +184,41 @@ class UpdatingReplies(unittest.TestCase):
         records.log_reply(second_reply)
         self.assertEqual(len(records.logged_replies()), 3)
 
+    def test_adding_replies_no_limit(self):
+        records = RecordKeeper()
+        reply = Reply(Comment(), Quote("", "", []))
+        replies = [reply, reply, reply, reply]
+        records.log_reply(replies)
+        records.log_reply(replies)
+        self.assertEqual(len(records.logged_replies()), 8)
+
+    def test_adding_matches_with_match_limit(self):
+        records = RecordKeeper()
+        records.maximum_replies(3)
+        reply = Reply(Comment(), Quote("", "", []))
+        replies = [reply, reply, reply, reply]
+        records.log_reply(replies)
+        records.log_reply(replies)
+        self.assertEqual(len(records.logged_replies()), 3)
+
+    def test_adding_matches_with_no_matches_allowed(self):
+        records = RecordKeeper()
+        records.maximum_replies(0)
+        reply = Reply(Comment(), Quote("", "", []))
+        replies = [reply, reply, reply, reply]
+        records.log_reply(replies)
+        records.log_reply(replies)
+        self.assertEqual(len(records.logged_replies()), 0)
+
+    def test_adding_matches_capping_limit(self):
+        records = RecordKeeper()
+        reply = Reply(Comment(), Quote("", "", []))
+        replies = [reply, reply, reply, reply]
+        records.log_reply(replies)
+        records.log_reply(replies)
+        records.maximum_replies(2)
+        self.assertEqual(len(records.logged_replies()), 2)
+
 
 class RetrievingQuotes(unittest.TestCase):
 
@@ -148,18 +248,12 @@ class LoadingRecordsFromJSON(unittest.TestCase):
 
     def test_good_records(self):
         records = RecordKeeper()
-        records.records = {
-            "test": 12345
-        }
-
         infile = StringIO()
         json.dump(records.to_dict(), infile, indent=2)
         infile.seek(0)
 
         loaded = RecordLoader.from_json(infile)
-        self.assertEqual(loaded.records, {
-            "test": 12345
-        })
+        self.assertEqual(loaded.records, records.to_dict()["records"])
 
     def test_bad_keys(self):
         infile = StringIO()
@@ -176,18 +270,15 @@ class LoadingRecordsFromJSON(unittest.TestCase):
 
 class SavingRecordsToJSON(unittest.TestCase):
 
-    def test_credentials_not_provided(self):
+    def test_records_not_provided(self):
         records = RecordKeeper().to_dict()
         outfile = StringIO()
         RecordStorer.to_json(outfile)
         outfile.seek(0)
         self.assertEqual(outfile.read(), json.dumps(records, indent=2))
 
-    def test_credentials_provided(self):
+    def test_records_provided(self):
         records = RecordKeeper()
-        records.records = {
-            "test": 12345
-        }
         outfile = StringIO()
         RecordStorer.to_json(outfile, records)
         outfile.seek(0)
