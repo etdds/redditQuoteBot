@@ -33,8 +33,8 @@ class Configuration():
             discard_comments_with_author=True
         )
         self.records = SimpleNamespace(
-            maximum_comment_count=None,
-            maximum_match_count=None,
+            maximum_comment_count=0,
+            maximum_match_count=100,
             maximum_reply_count=None,
         )
 
