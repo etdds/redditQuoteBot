@@ -32,6 +32,11 @@ class Configuration():
             matched_sentence_coefficient=0.5,
             discard_comments_with_author=True
         )
+        self.records = SimpleNamespace(
+            maximum_comment_count=None,
+            maximum_match_count=None,
+            maximum_reply_count=None,
+        )
 
     def to_dict(self) -> dict:
         """Get the configuration as a dictionary"""
@@ -56,7 +61,12 @@ class Configuration():
                 "quote_length_bonus_end": self.nlp.quote_length_bonus_end,
                 "matched_sentence_coefficient": self.nlp.matched_sentence_coefficient,
                 "discard_comments_with_author": self.nlp.discard_comments_with_author
-            }
+            },
+            "records": {
+                "maximum_comment_count": self.records.maximum_comment_count,
+                "maximum_match_count": self.records.maximum_match_count,
+                "maximum_reply_count": self.records.maximum_reply_count
+            },
         }
 
 
@@ -94,6 +104,9 @@ class ConfigurationLoader():
             config.nlp.quote_length_bonus_end = loaded["nlp"]["quote_length_bonus_end"]
             config.nlp.matched_sentence_coefficient = loaded["nlp"]["matched_sentence_coefficient"]
             config.nlp.discard_comments_with_author = loaded["nlp"]["discard_comments_with_author"]
+            config.records.maximum_comment_count = loaded["records"]["maximum_comment_count"]
+            config.records.maximum_match_count = loaded["records"]["maximum_match_count"]
+            config.records.maximum_reply_count = loaded["records"]["maximum_reply_count"]
         except KeyError as exp:
             raise KeyError("Cannot load given configuration.") from exp
         return config

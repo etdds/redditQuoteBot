@@ -80,6 +80,9 @@ class CheckAllCredential(unittest.TestCase):
         config.nlp.quote_length_bonus_end = 20
         config.nlp.matched_sentence_coefficient = 1
         config.nlp.discard_comments_with_author = False
+        config.records.maximum_comment_count = 0
+        config.records.maximum_match_count = None
+        config.records.maximum_reply_count = 100
 
         outfile = StringIO()
         ConfigurationGenerator.to_json(outfile, config)
@@ -101,3 +104,6 @@ class CheckAllCredential(unittest.TestCase):
         self.assertEqual(loaded.nlp.quote_length_bonus_end, 20)
         self.assertEqual(loaded.nlp.matched_sentence_coefficient, 1)
         self.assertEqual(loaded.nlp.discard_comments_with_author, False)
+        self.assertEqual(loaded.records.maximum_comment_count, 0)
+        self.assertEqual(loaded.records.maximum_match_count, None)
+        self.assertEqual(loaded.records.maximum_reply_count, 100)
