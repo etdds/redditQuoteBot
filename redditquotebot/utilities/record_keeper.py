@@ -166,10 +166,9 @@ class RecordLoader():
         data = json.load(file_handler)
         records = RecordKeeper()
         try:
-            records.records = data["records"]
-            records.log_comments(data["records"]["comments"])
-            records.log_matched_quote(data["records"]["matches"])
-            records.log_reply(data["records"]["replies"])
+            records.log_comments([Comment.from_dict(c) for c in data["records"]["comments"]])
+            records.log_matched_quote([MatchedQuote.from_dict(m) for m in data["records"]["matches"]])
+            records.log_reply([Reply.from_dict(r) for r in data["records"]["replies"]])
         except KeyError as exp:
             raise KeyError("Correct keys not found in records file. Consider removing.") from exp
         return records

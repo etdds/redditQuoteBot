@@ -248,12 +248,17 @@ class LoadingRecordsFromJSON(unittest.TestCase):
 
     def test_good_records(self):
         records = RecordKeeper()
+        records.log_comments(Comment())
+        records.log_matched_quote(MatchedQuote(Comment(), Quote("body", "a", []), 0.2))
+        records.log_reply(Reply(Comment(), Quote("", "", [])))
         infile = StringIO()
         json.dump(records.to_dict(), infile, indent=2)
         infile.seek(0)
 
         loaded = RecordLoader.from_json(infile)
-        self.assertEqual(loaded.records, records.to_dict()["records"])
+        self.assertEqual(loaded.logged_comments(), records.logged_comments())
+        self.assertEqual(loaded.logged_matches(), records.logged_matches())
+        self.assertEqual(loaded.logged_replies()[0].comment, records.logged_replies()[0].comment)
 
     def test_bad_keys(self):
         infile = StringIO()
