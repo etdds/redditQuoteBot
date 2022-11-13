@@ -92,6 +92,11 @@ The configuration file `configuration.json` is created the first time is run, an
     "quote_length_bonus_end": 10,
     "matched_sentence_coefficient": 0.5,
     "discard_comments_with_author": true
+  },
+  "records": {
+    "maximum_comment_count": 0,
+    "maximum_match_count": 100,
+    "maximum_reply_count": null
   }
 }
 ```
@@ -111,6 +116,9 @@ The configuration file `configuration.json` is created the first time is run, an
 |               | quote_length_bonus_start              |  The starting quote sentence length needed for the NLP score bonus to be applied. |
 |               | quote_length_bonus_end                |  The maximum quote sentence length to which a bonus NLP score is applied. |
 |               | discard_comments_with_author          |  Define if comments should be matched to quotes when the body of the comment contains the author of the quote |
+|records        | maximum_comment_count                 |  Specify the maximum number of comments to be logged in `records.json` . 0 = None, null = No limit |
+|               | maximum_match_count                   |  Specify the maximum number of matches to be logged in `records.json`. 0 = None, null = No limit |
+|               | maximum_reply_count                   |  Specify the maximum number of replies to be logged in `records.json`. 0 = None, null = No limit |
 
 ### Credentials
 

@@ -2,25 +2,70 @@ from io import TextIOWrapper
 from typing import Optional, List, Union
 from redditquotebot.reddit import Comment, Reply
 from redditquotebot.nlp import MatchedQuote
+from collections import deque
 import json
 
 
 class RecordKeeper():
-    """Contains information on the latest requests and comment dates
+    """Contains information on the latest comments, matches and replies.
     """
 
     def __init__(self):
+        self._maximum_comments = None
+        self._maximum_matches = None
+        self._maximum_replies = None
         self.records = {
-            "comments": [],
-            "matches": [],
-            "replies": []
+            "comments": deque(maxlen=self._maximum_comments),
+            "matches": deque(maxlen=self._maximum_matches),
+            "replies": deque(maxlen=self._maximum_replies)
         }
+
+    def maximum_comments(self, count: Union[None, int]) -> None:
+        """Set the maximum amount of comments which can exist in a record.
+
+        Oldest comments are discarded.
+
+        Args:
+            count (Union[None, int]): maximum count
+        """
+        self._maximum_comments = count
+        new_comments = deque(self.records["comments"], maxlen=count)
+        self.records["comments"] = new_comments
+
+    def maximum_matches(self, count: Union[None, int]) -> None:
+        """Set the maximum amount of matches which can exist in a record.
+
+        Oldest matches are discarded.
+
+        Args:
+            count (Union[None, int]): maximum count
+        """
+        self._maximum_matches = count
+        new_matches = deque(self.records["matches"], maxlen=count)
+        self.records["matches"] = new_matches
+
+    def maximum_replies(self, count: Union[None, int]) -> None:
+        """Set the maximum amount of replies which can exist in a record.
+
+        Oldest replies are discarded.
+
+        Args:
+            count (Union[None, int]): maximum count
+        """
+        self._maximum_replies = count
+        new_replies = deque(self.records["replies"], maxlen=count)
+        self.records["replies"] = new_replies
 
     def to_dict(self) -> dict:
         """Get the records as a dictionary"""
-        return {
-            "records": self.records,
+        d = {
+            "records": {
+                "comments": list(self.records["comments"]),
+                "matches": list(self.records["matches"]),
+                "replies": list(self.records["replies"])
+            }
         }
+        return d
 
     def log_comments(self, comments: Union[List[Comment], Comment]):
         """Log comments to the record keeper
@@ -119,12 +164,15 @@ class RecordLoader():
             RecordKeeper: instance of records
         """
         data = json.load(file_handler)
-        state = RecordKeeper()
+        records = RecordKeeper()
         try:
-            state.records = data["records"]
+            records.records = data["records"]
+            records.log_comments(data["records"]["comments"])
+            records.log_matched_quote(data["records"]["matches"])
+            records.log_reply(data["records"]["replies"])
         except KeyError as exp:
             raise KeyError("Correct keys not found in records file. Consider removing.") from exp
-        return state
+        return records
 
 
 class RecordStorer():

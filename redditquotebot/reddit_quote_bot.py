@@ -171,13 +171,17 @@ class RedditQuoteBot():
 
     def _load_records(self) -> RecordKeeper:
         if not self.ram_based_records:
-            return self.record_keeper_loader["handler"](self.record_keeper_loader["filepath"])
+            records = self.record_keeper_loader["handler"](self.record_keeper_loader["filepath"])
         else:
             try:
-                return self.records
+                records = self.records
             except AttributeError:
                 self.records = RecordKeeper()
-                return self.records
+                records = self.records
+        records.maximum_comments(self.configuration.records.maximum_comment_count)
+        records.maximum_matches(self.configuration.records.maximum_match_count)
+        records.maximum_replies(self.configuration.records.maximum_reply_count)
+        return records
 
     def _save_scrape_state(self, scrape_state: ScrapeState):
         if not self.ram_based_scrape_state:
