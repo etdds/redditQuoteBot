@@ -39,7 +39,10 @@
 				"ms-python.vscode-pylance",
 				"vscodevim.vim",
 				"mhutchie.git-graph",
-				"njpwerner.autodocstring"
+				"njpwerner.autodocstring",
+				"shd101wyy.markdown-preview-enhanced",
+				"bierner.markdown-preview-github-styles",
+				"streetsidesoftware.code-spell-checker"
 			]
 		}
 	},
