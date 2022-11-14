@@ -104,7 +104,7 @@ class QuoteNLPDetector(QuoteDetector):
         return ''.join([i if (ord(i) < 128) and (ord(i) >= 32) and i not in ["-", ":", "?"] else ' ' for i in comment])
 
     def _contains_author(self, body: str, author: str) -> bool:
-        word_list = self._get_only_ascii(body).replace(".", " ").split(" ")
+        word_list = self._get_only_ascii(body).replace(".", "").replace(",", "").split(" ")
         for name in author.split(" "):
             if len(name) > 2 and name in word_list:
                 return True
