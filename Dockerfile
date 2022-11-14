@@ -11,6 +11,7 @@ RUN chown -R app_user /application && \
     git 
 USER  app_user
 RUN pip install --user /application
+RUN pip install --user https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.4.1/en_core_web_md-3.4.1-py3-none-any.whl
 
 WORKDIR /home/app_user/run
 
