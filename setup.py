@@ -30,5 +30,5 @@ with open("README.md", "r") as fh:
         ],
         extras_require={},
         use_scm_version=True,
-        setup_requires=["setuptools_scm"]
+        setup_requires=["setuptools_scm", "wheel"]
     )
