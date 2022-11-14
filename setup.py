@@ -25,10 +25,9 @@ with open("README.md", "r") as fh:
         ],
         install_requires=[
             "praw==7.6.0",
-            "spacy==3.4.2",
-            "en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.4.1/en_core_web_md-3.4.1-py3-none-any.whl"
+            "spacy==3.4.2"
         ],
         extras_require={},
         use_scm_version=True,
-        setup_requires=["setuptools_scm"]
+        setup_requires=["setuptools_scm", "wheel"]
     )
