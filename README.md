@@ -15,10 +15,15 @@ The bot periodically requests comments from selected subreddits, sorted by newes
 
 ### Using Python
 
-The package is not published to [pypi](https://pypi.org/) yet, but can be installed from this repository:
+The package is available on [pypi](https://pypi.org/project/redditquotebot/), it can be installed with:
 
 ```bash
-pip install git+https://github.com/etdds/redditQuoteBot.git
+pip install redditquotebot
+```
+
+A Spacy language model is also needed for natural language processing. Testing is conducted with `en-core-web-md`:
+```bash
+pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.4.1/en_core_web_md-3.4.1-py3-none-any.whl
 ```
 
 Generate the configuration and credential templates in the current directory (see reference below):
