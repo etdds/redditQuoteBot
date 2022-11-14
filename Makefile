@@ -10,6 +10,10 @@ build-image:
 	@docker build -t ${IMG} .
 	@docker tag ${IMG} ${LATEST}
 
+build-package:
+	@python3 setup.py bdist_wheel
+	@python3 setup.py sdist
+
 test:
 	@python -m unittest discover -v -s ./tests -p test_*.py 
 
