@@ -35,7 +35,7 @@ class RedditQuoteBot():
         }
         self.ram_based_records = False
         self.ram_based_scrape_state = False
-        self.reddit = IReddit(self.configuration, self.credentials)
+        self.reddit = Reddit(self.configuration, self.credentials)
         self.quote_matcher = QuoteCommentMatcher()
         self.quote_threshold = 1.0
         self.detector = QuoteDetector([])

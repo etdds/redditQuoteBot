@@ -1,5 +1,4 @@
-
-from redditquotebot.reddit import IReddit, RedditConnectionError, RedditReplyError
+from redditquotebot.reddit import RedditConnectionError, RedditReplyError
 from redditquotebot.utilities import Configuration, CredentialStore
 from redditquotebot.reddit import Comment, Reply
 from typing import List
@@ -7,7 +6,7 @@ import praw
 from prawcore.exceptions import Forbidden
 
 
-class Reddit(IReddit):
+class Reddit():
     """Interface around praw, for interacting with Reddit
     """
 
@@ -18,7 +17,8 @@ class Reddit(IReddit):
             configuration (Configuration): The configuration to use.
             credentials (CredentialStore): Credentials to use for connecting to Reddit.
         """
-        super().__init__(configuration, credentials)
+        self.configuration = configuration
+        self.credentials = credentials
         self._reddit = None
 
     def connect(self):

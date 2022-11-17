@@ -86,7 +86,6 @@ class SettingUpQuotes(unittest.TestCase):
 class SettingQuoteMatcher(unittest.TestCase):
     def test_setting_value(self):
         builder = BotBuilder()
-        builder.reddit(Reddit)
         matcher = QuoteCommentLengthMatcher()
         builder.quote_matcher(matcher, 0.5)
         self.assertEqual(builder._bot.quote_threshold, 0.5)
@@ -98,25 +97,6 @@ class SettingQuoteDetector(unittest.TestCase):
         builder = BotBuilder()
         builder.quote_detector(QuoteNLPDetector)
         self.assertEqual(builder._quote_detector_instance, QuoteNLPDetector)
-
-
-class SettingRedditInstance(unittest.TestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def testPassingInConcreteInstance(self):
-        configuration = Configuration()
-        configuration.reddit.subreddits = ["subreddit"]
-        builder = BotBuilder()
-        builder.reddit(Reddit)
-        # Manually override our handlers, so files can be build
-        builder._bot.record_keeper_loader["handler"] = (lambda _: (_ == _))
-        builder._bot.scrape_state_loader["handler"] = (lambda _: (_ == _))
-        bot = builder.bot()
-        self.assertIsInstance(bot.reddit, Reddit)
 
 
 class SettingRecoredKeeping(unittest.TestCase):

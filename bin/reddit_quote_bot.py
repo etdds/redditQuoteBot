@@ -9,7 +9,6 @@ import importlib.resources as pkg_resources
 
 import redditquotebot.data
 from redditquotebot import BotBuilder
-from redditquotebot.reddit import Reddit
 from redditquotebot.quotes import QuoteLoader
 from redditquotebot.nlp import QuoteCommentNLPMatcher, QuoteNLPDetector
 from redditquotebot.utilities import CredentialGenerator, ConfigurationGenerator, setup_logger
@@ -88,7 +87,6 @@ builder.quote_matcher(
     config.nlp.match_store_threshold
 )
 builder.quote_detector(QuoteNLPDetector)
-builder.reddit(Reddit)
 
 setup_logger(logging.INFO, f"run_log_{timestamp}.log")
 bot = builder.bot()

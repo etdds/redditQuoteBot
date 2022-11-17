@@ -1,4 +1,4 @@
-from redditquotebot.reddit import IReddit
+from redditquotebot.reddit import Reddit
 from redditquotebot.utilities import *
 from redditquotebot.quotes import QuoteDB, QuoteLoader
 from redditquotebot.nlp import QuoteCommentMatcher, QuoteDetector
@@ -12,7 +12,6 @@ class BotBuilder():
 
     def __init__(self):
         self._bot = RedditQuoteBot()
-        self._reddit_instance = IReddit
         self._quotes = QuoteDB([])
         self._quote_detector_instance = QuoteDetector
 
@@ -57,14 +56,6 @@ class BotBuilder():
             Configuration: The configuration loaded with self.configuration
         """
         return self._bot.configuration
-
-    def reddit(self, reddit: Type[IReddit]):
-        """Set the reddit implementation to use.
-
-        Args:
-            reddit (IReddit): Concrete class implementing the IReddit interface.
-        """
-        self._reddit_instance = reddit
 
     def scrape_state(self, path: Union[str, None]):
         """Provide the path of the file which logs current comment logger (scraper) states.
@@ -137,7 +128,7 @@ class BotBuilder():
             RedditQuoteBot: The configured bot instance
         """
         # Reinstate the reddit class with the actual derived class specified
-        self._bot.reddit = self._reddit_instance(self._bot.configuration, self._bot.credentials)
+        self._bot.reddit = Reddit(self._bot.configuration, self._bot.credentials)
         self._bot.detector = self._quote_detector_instance(self._quotes)
 
         # Create the scrape state and record keeper files if needed.
