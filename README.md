@@ -4,7 +4,7 @@ Reads all comments in selected subreddits and compares their comments to famous 
 
 ![Comment Demo](images/comment_demo.png?raw=true "Example reply")
 
-The bot is currently only collecting comments for backtesting. It's not actively replying to comments, yet.
+I'm live! Check out what I've been up to on [Reddit](https://www.reddit.com/user/redditQuoteBot/comments/).
 
 ## Overview
 
