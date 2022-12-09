@@ -17,7 +17,8 @@ class RecordKeeper():
         self.records = {
             "comments": deque(maxlen=self._maximum_comments),
             "matches": deque(maxlen=self._maximum_matches),
-            "replies": deque(maxlen=self._maximum_replies)
+            "replies": deque(maxlen=self._maximum_replies),
+            "banned_subreddits": []
         }
 
     def maximum_comments(self, count: Union[None, int]) -> None:
@@ -56,13 +57,31 @@ class RecordKeeper():
         new_replies = deque(self.records["replies"], maxlen=count)
         self.records["replies"] = new_replies
 
+    def banned_subreddits(self) -> List[str]:
+        """Get the list of currently banned subreddits.
+
+        Returns:
+            List[str]: List of subreddits banned
+        """
+        return self.records["banned_subreddits"]
+
+    def add_banned_subreddit(self, subreddit: str) -> None:
+        """Add a subreddit to the list of banned subreddits.
+
+        Args:
+            subreddit (str): The subreddit to add. Duplicates are ignored.
+        """
+        if subreddit not in self.records["banned_subreddits"]:
+            self.records["banned_subreddits"].append(subreddit)
+
     def to_dict(self) -> dict:
         """Get the records as a dictionary"""
         d = {
             "records": {
                 "comments": list(self.records["comments"]),
                 "matches": list(self.records["matches"]),
-                "replies": list(self.records["replies"])
+                "replies": list(self.records["replies"]),
+                "banned_subreddits": self.records["banned_subreddits"]
             }
         }
         return d
@@ -169,6 +188,8 @@ class RecordLoader():
             records.log_comments([Comment.from_dict(c) for c in data["records"]["comments"]])
             records.log_matched_quote([MatchedQuote.from_dict(m) for m in data["records"]["matches"]])
             records.log_reply([Reply.from_dict(r) for r in data["records"]["replies"]])
+            for sub in data["records"]["banned_subreddits"]:
+                records.add_banned_subreddit(sub)
         except KeyError as exp:
             raise KeyError("Correct keys not found in records file. Consider removing.") from exp
         return records

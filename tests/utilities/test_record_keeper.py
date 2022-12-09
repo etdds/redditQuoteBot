@@ -234,6 +234,38 @@ class RetrievingQuotes(unittest.TestCase):
         self.assertEqual(replies[0].quote.body, "body")
 
 
+class BannedSubs(unittest.TestCase):
+
+    def test_getting_initial_banned_list(self):
+        records = RecordKeeper()
+        bl = records.banned_subreddits()
+        self.assertEqual(len(bl), 0)
+
+    def test_adding_unique_entry(self):
+        records = RecordKeeper()
+        records.add_banned_subreddit("test")
+        bl = records.banned_subreddits()
+        self.assertEqual(len(bl), 1)
+        self.assertIn("test", bl)
+
+    def test_adding_multiple_unique(self):
+        records = RecordKeeper()
+        records.add_banned_subreddit("test")
+        records.add_banned_subreddit("test1")
+        bl = records.banned_subreddits()
+        self.assertEqual(len(bl), 2)
+        self.assertIn("test", bl)
+        self.assertIn("test1", bl)
+
+    def test_adding_duplicate(self):
+        records = RecordKeeper()
+        records.add_banned_subreddit("test")
+        records.add_banned_subreddit("test")
+        bl = records.banned_subreddits()
+        self.assertEqual(len(bl), 1)
+        self.assertIn("test", bl)
+
+
 class GettingDict(unittest.TestCase):
 
     def test_to_dict(self):
@@ -242,6 +274,7 @@ class GettingDict(unittest.TestCase):
         self.assertEqual(len(d["comments"]), 0)
         self.assertEqual(len(d["matches"]), 0)
         self.assertEqual(len(d["replies"]), 0)
+        self.assertEqual(len(d["banned_subreddits"]), 0)
 
 
 class LoadingRecordsFromJSON(unittest.TestCase):
@@ -251,6 +284,7 @@ class LoadingRecordsFromJSON(unittest.TestCase):
         records.log_comments(Comment())
         records.log_matched_quote(MatchedQuote(Comment(), Quote("body", "a", []), 0.2))
         records.log_reply(Reply(Comment(), Quote("", "", [])))
+        records.add_banned_subreddit("test")
         infile = StringIO()
         json.dump(records.to_dict(), infile, indent=2)
         infile.seek(0)
@@ -259,6 +293,7 @@ class LoadingRecordsFromJSON(unittest.TestCase):
         self.assertEqual(loaded.logged_comments(), records.logged_comments())
         self.assertEqual(loaded.logged_matches(), records.logged_matches())
         self.assertEqual(loaded.logged_replies()[0].comment, records.logged_replies()[0].comment)
+        self.assertEqual(loaded.banned_subreddits()[0], "test")
 
     def test_bad_keys(self):
         infile = StringIO()
