@@ -34,7 +34,8 @@ class Reddit():
                 client_id=self.credentials.reddit.client_id,
                 client_secret=self.credentials.reddit.client_secret,
                 username=self.credentials.reddit.username,
-                password=self.credentials.reddit.password
+                password=self.credentials.reddit.password,
+                ratelimit_minutes=60
             )
         except Exception as exp:
             raise exp from exp
