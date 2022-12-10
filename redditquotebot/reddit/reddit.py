@@ -66,22 +66,17 @@ class Reddit():
         for submission in subreddit.new(limit=count):
             submission.comments.replace_more(limit=None)
             for comment in submission.comments.list():
-                new_comment = Comment()
-                new_comment.body = comment.body
-                new_comment.utc = comment.created_utc
-                new_comment.edited = comment.edited
-                new_comment.subreddit = comment.subreddit_name_prefixed
-                new_comment.url = f"https://reddit.com{comment.permalink}"
-                new_comment.uid = comment.id
-                new_comment.score = comment.score
-                try:
-                    new_comment.author = comment.author.name
-                except AttributeError:
-                    new_comment.author = "unknown"
-                comments.append(new_comment)
+                comments.append(self._extract_comment(comment))
                 if (len(comments) >= max_comments):
                     return comments
 
+        return comments
+
+    def get_user_comments(self, user_name: str) -> List[Comment]:
+        comments = []
+        redditor = self._reddit.redditor(user_name)
+        for comment in redditor.comments.new(limit=None):
+            comments.append(self._extract_comment(comment))
         return comments
 
     def reply_to_comment(self, comment: Comment, reply: Reply):
@@ -99,3 +94,18 @@ class Reddit():
             comment.reply(reply.body())
         except Forbidden as exc:
             raise RedditReplyError("Cannot post reply, got internal forbidden exception") from exc
+
+    def _extract_comment(self, comment) -> Comment:
+        new_comment = Comment()
+        new_comment.body = comment.body
+        new_comment.utc = comment.created_utc
+        new_comment.edited = comment.edited
+        new_comment.subreddit = comment.subreddit_name_prefixed
+        new_comment.url = f"https://reddit.com{comment.permalink}"
+        new_comment.uid = comment.id
+        new_comment.score = comment.score
+        try:
+            new_comment.author = comment.author.name
+        except AttributeError:
+            new_comment.author = "unknown"
+        return new_comment
