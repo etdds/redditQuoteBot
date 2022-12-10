@@ -155,7 +155,8 @@ class RedditQuoteBot():
                     try:
                         replies = self.reply_to_comments(matches, threshold, records)
                     except RedditReplyError:
-                        # Looks like we're banned from this subreddit
+                        logger.warning(
+                            f"Received forbidden exception from Praw, look like the bot has been banned from {subreddit}!")
                         records.add_banned_subreddit(subreddit)
                         replies = []
 
