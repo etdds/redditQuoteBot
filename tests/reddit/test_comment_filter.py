@@ -1,5 +1,5 @@
 import unittest
-from redditquotebot.reddit import Comment, CommentAuthorFilter, CommentFilter, CommentUTCFilter, CommentUIDFilter, CommentEdditedFilter, CommentLengthFilter
+from redditquotebot.reddit import Comment, CommentAuthorFilter, CommentFilter, CommentUTCFilter, CommentUIDFilter, CommentEdditedFilter, CommentLengthFilter, CommentScoreFilter
 
 
 class TestCommentAuthorFilter(unittest.TestCase):
@@ -189,6 +189,19 @@ class TestCommentEditedFilter(unittest.TestCase):
         not_equal = matcher != False
         self.assertEqual(equal, False)
         self.assertEqual(not_equal, True)
+
+
+class TestCommentScoreFilter(unittest.TestCase):
+
+    def test_comarisons_with_builtins(self):
+        comment1 = Comment()
+        comment1.score = 13
+        self.assertEqual(CommentScoreFilter(comment1) == 13, True)
+        self.assertEqual(CommentScoreFilter(comment1) != 17, True)
+        self.assertEqual(CommentScoreFilter(comment1) > 12, True)
+        self.assertEqual(CommentScoreFilter(comment1) >= 13, True)
+        self.assertEqual(CommentScoreFilter(comment1) < 14, True)
+        self.assertEqual(CommentScoreFilter(comment1) <= 13, True)
 
 
 class TestCommentFilter(unittest.TestCase):

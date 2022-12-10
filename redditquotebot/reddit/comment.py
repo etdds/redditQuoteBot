@@ -11,9 +11,10 @@ class Comment():
         self.subreddit = ""
         self.edited = False
         self.uid = ""
+        self.score = 0
 
     def __repr__(self):
-        return f"Author: {self.author}, utc: {self.utc}, subreddit: {self.subreddit}, edited: {self.edited}, url: {self.url}, id: {self.uid}, body: {self.body}"
+        return f"Author: {self.author}, utc: {self.utc}, subreddit: {self.subreddit}, edited: {self.edited}, url: {self.url}, id: {self.uid}, body: {self.body}, score: {self.score}"
 
     def to_dict(self) -> dict:
         """Return the contents of the comment as a dictionary.
@@ -29,6 +30,7 @@ class Comment():
             "subreddit": self.subreddit,
             "edited": self.edited,
             "uid": self.uid,
+            "score": self.score,
         }
 
     @staticmethod
@@ -46,6 +48,11 @@ class Comment():
         comment.subreddit = comment_dict["subreddit"]
         comment.edited = comment_dict["edited"]
         comment.uid = comment_dict["uid"]
+        # Adding in a try block keeps backwards compatibility.
+        try:
+            comment.score = comment_dict["score"]
+        except KeyError:
+            comment.score = 1
         return comment
 
     def __eq__(self, other):

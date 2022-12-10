@@ -120,6 +120,32 @@ class CommentUTCFilter():
             return self._comment.utc <= other
 
 
+class CommentScoreFilter():
+    """Filter a comment by its score
+    """
+
+    def __init__(self, comment: Comment):
+        self._comment = comment
+
+    def __eq__(self, other: object) -> bool:
+        return self._comment.score == other
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __gt__(self, other) -> bool:
+        return self._comment.score > other
+
+    def __ge__(self, other) -> bool:
+        return self._comment.score >= other
+
+    def __lt__(self, other) -> bool:
+        return self._comment.score < other
+
+    def __le__(self, other) -> bool:
+        return self._comment.score <= other
+
+
 class CommentFilter():
     """Filter a set of comments by a number of filters
     """

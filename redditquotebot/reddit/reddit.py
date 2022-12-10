@@ -73,6 +73,7 @@ class Reddit():
                 new_comment.subreddit = comment.subreddit_name_prefixed
                 new_comment.url = f"https://reddit.com{comment.permalink}"
                 new_comment.uid = comment.id
+                new_comment.score = comment.score
                 try:
                     new_comment.author = comment.author.name
                 except AttributeError:

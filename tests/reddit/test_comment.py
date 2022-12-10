@@ -19,6 +19,7 @@ class UsingDictionaries(unittest.TestCase):
         comment.subreddit = "test"
         comment.url = "www"
         comment.utc = 12345
+        comment.score = 12
         d = comment.to_dict()
         self.assertEqual(d["author"], "ben")
         self.assertEqual(d["uid"], "abcd")
@@ -27,6 +28,7 @@ class UsingDictionaries(unittest.TestCase):
         self.assertEqual(d["subreddit"], "test")
         self.assertEqual(d["url"], "www")
         self.assertEqual(d["utc"], 12345)
+        self.assertEqual(d["score"], 12)
 
     def test_comment_from_dictionary(self):
         d = {
@@ -37,6 +39,7 @@ class UsingDictionaries(unittest.TestCase):
             "utc": 1234,
             "url": "www",
             "subreddit": "test",
+            "score": 20
         }
         comment = Comment().from_dict(d)
         self.assertEqual(comment.author, "ben")
@@ -46,6 +49,7 @@ class UsingDictionaries(unittest.TestCase):
         self.assertEqual(comment.subreddit, "test")
         self.assertEqual(comment.url, "www")
         self.assertEqual(comment.utc, 1234)
+        self.assertEqual(comment.score, 20)
 
 
 class CommentEquality(unittest.TestCase):
