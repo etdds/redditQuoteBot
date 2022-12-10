@@ -159,6 +159,10 @@ Contains a log of all comments and quotes which matched with a score above the `
 
 Contains a log of all replies which have been sent (or just logged if `reply_to_comments` is set to false). These are generally matches with a score above `reply_threshold`.
 
+#### Banned Subreddit Section
+
+Contains a list of subreddits which the bot thinks it is banned from. This is determined by receiving a forbidden exception when trying to post a reply.
+
 ```json
 {
     "records": {
@@ -214,6 +218,9 @@ Contains a log of all replies which have been sent (or just logged if `reply_to_
           },
           "body": "Hi peter-doubt,\n\nIt looks like your comment closely matches the famous quote:\n\n\"Just because you're paranoid doesn't mean they aren't after you.\"\n\nJoseph Heller,\n\nI'm a bot and this action was automatic. [project source](https://www.google.com)\n        "
         }
+      ],
+      "banned_subreddits": [
+        "test"
       ]
     }
   }
