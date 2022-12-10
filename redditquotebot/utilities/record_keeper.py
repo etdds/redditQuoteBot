@@ -188,10 +188,13 @@ class RecordLoader():
             records.log_comments([Comment.from_dict(c) for c in data["records"]["comments"]])
             records.log_matched_quote([MatchedQuote.from_dict(m) for m in data["records"]["matches"]])
             records.log_reply([Reply.from_dict(r) for r in data["records"]["replies"]])
+        except KeyError as exp:
+            raise KeyError("Correct keys not found in records file. Consider removing.") from exp
+        try:
             for sub in data["records"]["banned_subreddits"]:
                 records.add_banned_subreddit(sub)
         except KeyError as exp:
-            raise KeyError("Correct keys not found in records file. Consider removing.") from exp
+            pass
         return records
 
 
