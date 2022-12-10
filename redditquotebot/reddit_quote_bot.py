@@ -148,7 +148,13 @@ class RedditQuoteBot():
                     match_time = round(subreddit_timer.elapsed(), 2)
 
                     threshold = self.configuration.bot.reply_threshold
-                    replies = self.reply_to_comments(matches, threshold, records)
+                    try:
+                        replies = self.reply_to_comments(matches, threshold, records)
+                    except RedditReplyError:
+                        # Looks like we're banned from this subreddit
+                        records.add_banned_subreddit(subreddit)
+                        replies = []
+
                     reply_time = round(subreddit_timer.elapsed(), 2)
                     logger.info(
                         f"Subreddit {subreddit}: {len(new_comments)} comments in {comment_time}s, {len(matches)} matches in {match_time}s, {len(replies)} replies in {reply_time}s")
