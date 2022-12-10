@@ -135,6 +135,10 @@ class RedditQuoteBot():
                     scrape_state = self._load_scrape_state()
                     records = self._load_records()
 
+                    if subreddit in records.banned_subreddits():
+                        time.sleep(10)
+                        continue
+
                     subreddit_timer = TimeDelta()
                     try:
                         new_comments = self.get_latest_comments(subreddit, scrape_state, records)
