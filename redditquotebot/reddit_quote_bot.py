@@ -118,7 +118,7 @@ class RedditQuoteBot():
         records.log_reply(replies)
         return replies
 
-    def clean_own_comments(self):
+    def clean_own_comments(self, records: RecordKeeper):
         if not self.configuration.bot.remove_own_comments:
             return
         username = self.credentials.reddit.username
@@ -130,6 +130,7 @@ class RedditQuoteBot():
         for comment in pending_removal:
             try:
                 self.reddit.remove_comment(comment)
+                records.log_removed_comment(comment)
                 logger.info(f"Removing comment {comment.uid}, at {comment.url}, with score {comment.score}.")
             except RedditUserAuthenticationError as exp:
                 logger.warning(f"Failed removing comment {comment.uid}, got authentication error. {exp}")
@@ -185,7 +186,11 @@ class RedditQuoteBot():
                     with DelayedKeyboardInterrupt():
                         self._save_records(records)
                         self._save_scrape_state(scrape_state)
-                self.clean_own_comments()
+
+                records = self._load_records()
+                self.clean_own_comments(records)
+                with DelayedKeyboardInterrupt():
+                    self._save_records(records)
             except KeyboardInterrupt:
                 print()
                 sys.exit()
