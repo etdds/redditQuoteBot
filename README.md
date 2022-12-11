@@ -128,6 +128,7 @@ The configuration file `configuration.json` is created the first time is run, an
 |records        | maximum_comment_count                 |  Specify the maximum number of comments to be logged in `records.json` . 0 = None, null = No limit |
 |               | maximum_match_count                   |  Specify the maximum number of matches to be logged in `records.json`. 0 = None, null = No limit |
 |               | maximum_reply_count                   |  Specify the maximum number of replies to be logged in `records.json`. 0 = None, null = No limit |
+|               | maximum_removed_comment_count         |  Specify the maximum number of removed comments to be logged in `records.json`. 0 = None, null = No limit |
 
 ### Credentials
 
@@ -162,6 +163,10 @@ Contains a log of all comments and quotes which matched with a score above the `
 #### Replies Section
 
 Contains a log of all replies which have been sent (or just logged if `reply_to_comments` is set to false). These are generally matches with a score above `reply_threshold`.
+
+#### Removed Section
+
+Contains a log of all self-posted comments that the bot has removed.
 
 #### Banned Subreddit Section
 
@@ -222,6 +227,18 @@ Contains a list of subreddits which the bot thinks it is banned from. This is de
           },
           "body": "Hi peter-doubt,\n\nIt looks like your comment closely matches the famous quote:\n\n\"Just because you're paranoid doesn't mean they aren't after you.\"\n\nJoseph Heller,\n\nI'm a bot and this action was automatic. [project source](https://www.google.com)\n        "
         }
+      ],
+      "removed": [
+        {
+          "body": "Hi Mikey2bz,\n\nIt looks like your comment closely matches the famous quote:\n\n\"It hurts to let go. Sometimes it seems the harder you try to hold on to something or someone the more it wants to get away. You feel like some kind of criminal for having felt, for having wanted. For having wanted to be wanted. It confuses you, because you think that your feelings were wrong and it makes you feel so small because it's so hard to keep it inside when you let it out and it doesn't coma back. You're left so alone that you can't explain. Damn, there's nothing like that, is there? I've been there and you have too. You're nodding your head.\" - Henry Rollins,\n\n*I'm a bot and this action was automatic [Project source](https://github.com/etdds/redditQuoteBot).*",
+          "utc": 1669551675.0,
+          "author": "redditQuoteBot",
+          "url": "https://reddit.com/r/Futurology/comments/z5mtb3/we_tasted_the_worlds_first_cultivated_steak_no/ixyo0nc/",
+          "subreddit": "r/Futurology",
+          "edited": false,
+          "uid": "ixyo0nc",
+          "score": -2
+        },
       ],
       "banned_subreddits": [
         "test"
