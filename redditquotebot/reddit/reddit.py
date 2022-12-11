@@ -73,6 +73,14 @@ class Reddit():
         return comments
 
     def get_user_comments(self, user_name: str) -> List[Comment]:
+        """Get a list of comments posted by a given user.
+
+        Args:
+            user_name (str): The username to query.
+
+        Returns:
+            List[Comment]: List of found comments.
+        """
         comments = []
         redditor = self._reddit.redditor(user_name)
         for comment in redditor.comments.new(limit=None):
@@ -80,6 +88,14 @@ class Reddit():
         return comments
 
     def remove_comment(self, comment: Comment):
+        """Remove a comment.
+
+        Args:
+            comment (Comment): The comment to remove. The UID field is used to lookup the comment.
+
+        Raises:
+            RedditUserAuthenticationError: Raised if an authentication error is thrown by reddit.
+        """
         c = self._reddit.comment(comment.uid)
         try:
             c.delete()
