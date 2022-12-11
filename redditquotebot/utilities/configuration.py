@@ -38,6 +38,7 @@ class Configuration():
             maximum_comment_count=0,
             maximum_match_count=100,
             maximum_reply_count=None,
+            maximum_removed_comment_count=None,
         )
 
     def to_dict(self) -> dict:
@@ -69,7 +70,8 @@ class Configuration():
             "records": {
                 "maximum_comment_count": self.records.maximum_comment_count,
                 "maximum_match_count": self.records.maximum_match_count,
-                "maximum_reply_count": self.records.maximum_reply_count
+                "maximum_reply_count": self.records.maximum_reply_count,
+                "maximum_removed_comment_count": self.records.maximum_removed_comment_count
             },
         }
 
@@ -113,6 +115,7 @@ class ConfigurationLoader():
             config.records.maximum_comment_count = loaded["records"]["maximum_comment_count"]
             config.records.maximum_match_count = loaded["records"]["maximum_match_count"]
             config.records.maximum_reply_count = loaded["records"]["maximum_reply_count"]
+            config.records.maximum_removed_comment_count = loaded["records"]["maximum_removed_comment_count"]
         except KeyError as exp:
             raise KeyError("Cannot load given configuration.") from exp
         return config

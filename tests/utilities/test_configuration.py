@@ -85,6 +85,7 @@ class CheckAllCredential(unittest.TestCase):
         config.records.maximum_comment_count = 0
         config.records.maximum_match_count = None
         config.records.maximum_reply_count = 100
+        config.records.maximum_removed_comment_count = 8
 
         outfile = StringIO()
         ConfigurationGenerator.to_json(outfile, config)
@@ -111,3 +112,4 @@ class CheckAllCredential(unittest.TestCase):
         self.assertEqual(loaded.records.maximum_comment_count, 0)
         self.assertEqual(loaded.records.maximum_match_count, None)
         self.assertEqual(loaded.records.maximum_reply_count, 100)
+        self.assertEqual(loaded.records.maximum_removed_comment_count, 8)

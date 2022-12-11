@@ -217,6 +217,7 @@ class RedditQuoteBot():
         records.maximum_comments(self.configuration.records.maximum_comment_count)
         records.maximum_matches(self.configuration.records.maximum_match_count)
         records.maximum_replies(self.configuration.records.maximum_reply_count)
+        records.maximum_removed_comments(self.configuration.records.maximum_removed_comment_count)
         return records
 
     def _save_scrape_state(self, scrape_state: ScrapeState):
