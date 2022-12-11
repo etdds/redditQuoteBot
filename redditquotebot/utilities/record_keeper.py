@@ -14,10 +14,12 @@ class RecordKeeper():
         self._maximum_comments = None
         self._maximum_matches = None
         self._maximum_replies = None
+        self._maximum_removed = None
         self.records = {
             "comments": deque(maxlen=self._maximum_comments),
             "matches": deque(maxlen=self._maximum_matches),
             "replies": deque(maxlen=self._maximum_replies),
+            "removed": deque(maxlen=self._maximum_removed),
             "banned_subreddits": []
         }
 
@@ -57,6 +59,18 @@ class RecordKeeper():
         new_replies = deque(self.records["replies"], maxlen=count)
         self.records["replies"] = new_replies
 
+    def maximum_removed_comments(self, count: Union[None, int]) -> None:
+        """Set the maximum amount of removed comments which can exist in a record.
+
+        Oldest removed comments recorded are discarded.
+
+        Args:
+            count (Union[None, int]): maximum count
+        """
+        self._maximum_removed = count
+        new_removals = deque(self.records["removed"], maxlen=count)
+        self.records["removed"] = new_removals
+
     def banned_subreddits(self) -> List[str]:
         """Get the list of currently banned subreddits.
 
@@ -81,6 +95,7 @@ class RecordKeeper():
                 "comments": list(self.records["comments"]),
                 "matches": list(self.records["matches"]),
                 "replies": list(self.records["replies"]),
+                "removed": list(self.records["removed"]),
                 "banned_subreddits": self.records["banned_subreddits"]
             }
         }
@@ -164,6 +179,32 @@ class RecordKeeper():
         except KeyError:
             return []
 
+    def log_removed_comment(self, comments: Union[List[Comment], Comment]):
+        """Log a removed comment to the record keeper.
+
+        Args:
+            comment (Union[List[Comment], Comment]): Either a list or single removed comment
+        """
+        if isinstance(comments, Comment):
+            comments = [comments.to_dict()]
+        else:
+            comments = [c.to_dict() for c in comments]
+        try:
+            self.records["removed"] += comments
+        except KeyError:
+            self.records["removed"] = comments
+
+    def logged_removed_comments(self) -> List[Comment]:
+        """Get all comments currently removed.
+
+        Returns:
+            List[Comment]: All logged comment removals
+        """
+        try:
+            return [Comment.from_dict(c) for c in self.records["removed"]]
+        except KeyError:
+            return []
+
 
 class RecordLoader():
     """Provides static methods for loading records from an external source
@@ -193,6 +234,11 @@ class RecordLoader():
         try:
             for sub in data["records"]["banned_subreddits"]:
                 records.add_banned_subreddit(sub)
+        except KeyError as exp:
+            pass
+
+        try:
+            records.log_removed_comment([Comment.from_dict(c) for c in data["records"]["removed"]])
         except KeyError as exp:
             pass
         return records

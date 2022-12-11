@@ -220,6 +220,50 @@ class UpdatingReplies(unittest.TestCase):
         self.assertEqual(len(records.logged_replies()), 2)
 
 
+class UpdatingRemovedComments(unittest.TestCase):
+
+    def test_fetching_removals_when_not_stored(self):
+        records = RecordKeeper()
+        self.assertEqual(len(records.logged_removed_comments()), 0)
+
+    def test_adding_single_removal(self):
+        comment = Comment()
+        records = RecordKeeper()
+        records.log_removed_comment(comment)
+        self.assertEqual(len(records.logged_removed_comments()), 1)
+
+    def test_adding_removal_list(self):
+        comment = Comment()
+        records = RecordKeeper()
+        records.log_removed_comment([comment, comment])
+        self.assertEqual(len(records.logged_removed_comments()), 2)
+
+    def test_adding_multiple_removals(self):
+        comment1 = Comment()
+        comment1.uid = "1"
+        comment2 = Comment()
+        comment2.uid = "2"
+        records = RecordKeeper()
+        records.log_removed_comment(comment1)
+        records.log_removed_comment(comment2)
+        self.assertEqual(len(records.logged_removed_comments()), 2)
+
+    def test_adding_removals_with_limit(self):
+        records = RecordKeeper()
+        records.maximum_removed_comments(1)
+        comment = Comment()
+        records.log_removed_comment(comment)
+        records.log_removed_comment(comment)
+        self.assertEqual(len(records.logged_removed_comments()), 1)
+
+    def test_adding_removals_with_size_zero(self):
+        records = RecordKeeper()
+        records.maximum_removed_comments(0)
+        comment = Comment()
+        records.log_removed_comment(comment)
+        self.assertEqual(len(records.logged_removed_comments()), 0)
+
+
 class RetrievingQuotes(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -274,6 +318,7 @@ class GettingDict(unittest.TestCase):
         self.assertEqual(len(d["comments"]), 0)
         self.assertEqual(len(d["matches"]), 0)
         self.assertEqual(len(d["replies"]), 0)
+        self.assertEqual(len(d["removed"]), 0)
         self.assertEqual(len(d["banned_subreddits"]), 0)
 
 
@@ -284,6 +329,9 @@ class LoadingRecordsFromJSON(unittest.TestCase):
         records.log_comments(Comment())
         records.log_matched_quote(MatchedQuote(Comment(), Quote("body", "a", []), 0.2))
         records.log_reply(Reply(Comment(), Quote("", "", [])))
+        removed = Comment()
+        removed.uid = "3"
+        records.log_removed_comment(removed)
         records.add_banned_subreddit("test")
         infile = StringIO()
         json.dump(records.to_dict(), infile, indent=2)
@@ -293,6 +341,7 @@ class LoadingRecordsFromJSON(unittest.TestCase):
         self.assertEqual(loaded.logged_comments(), records.logged_comments())
         self.assertEqual(loaded.logged_matches(), records.logged_matches())
         self.assertEqual(loaded.logged_replies()[0].comment, records.logged_replies()[0].comment)
+        self.assertEqual(loaded.logged_removed_comments()[0].uid, "3")
         self.assertEqual(loaded.banned_subreddits()[0], "test")
 
     def test_bad_keys(self):
