@@ -20,7 +20,9 @@ class Configuration():
         self.bot = SimpleNamespace(
             reply_to_comments=False,
             matched_quotes_to_log=3,
-            reply_threshold=0.99
+            reply_threshold=0.99,
+            remove_own_comments=True,
+            remove_comment_threshold=-1,
         )
         self.nlp = SimpleNamespace(
             match_store_threshold=0.97,
@@ -50,7 +52,9 @@ class Configuration():
             "bot": {
                 "reply_to_comments": self.bot.reply_to_comments,
                 "reply_threshold": self.bot.reply_threshold,
-                "matched_quotes_to_log": self.bot.matched_quotes_to_log
+                "matched_quotes_to_log": self.bot.matched_quotes_to_log,
+                "remove_own_comments": self.bot.remove_own_comments,
+                "remove_comment_threshold": self.bot.remove_comment_threshold
             },
             "nlp": {
                 "match_store_threshold": self.nlp.match_store_threshold,
@@ -96,6 +100,8 @@ class ConfigurationLoader():
             config.bot.reply_to_comments = loaded["bot"]["reply_to_comments"]
             config.bot.reply_threshold = loaded["bot"]["reply_threshold"]
             config.bot.matched_quotes_to_log = loaded["bot"]["matched_quotes_to_log"]
+            config.bot.remove_own_comments = loaded["bot"]["remove_own_comments"]
+            config.bot.remove_comment_threshold = loaded["bot"]["remove_comment_threshold"]
             config.nlp.match_store_threshold = loaded["nlp"]["match_store_threshold"]
             config.nlp.quote_comment_length_delta = loaded["nlp"]["quote_comment_length_delta"]
             config.nlp.minimum_comment_sentence_word_length = loaded["nlp"]["minimum_comment_sentence_word_length"]

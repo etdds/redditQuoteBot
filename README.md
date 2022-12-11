@@ -86,7 +86,9 @@ The configuration file `configuration.json` is created the first time is run, an
   "bot": {
     "reply_to_comments": true,
     "reply_threshold": 0.99,
-    "matched_quotes_to_log": 3
+    "matched_quotes_to_log": 3,
+    "remove_own_comments": true,
+    "remove_comment_threshold": -1
   },
   "nlp": {
     "match_store_threshold": 0.97,
@@ -114,6 +116,8 @@ The configuration file `configuration.json` is created the first time is run, an
 |bot            | reply_to_comments                     |  If set to true, replies are posted to reddit. If false, they are only logged in `records.json` |
 |               | reply_threshold                       |  The NLP score needed in order for a reply to be sent. Ranging between 0-1 |
 |               | matched_quotes_to_log                 |  The number of matches above `match_store_threshold` to log. |
+|               | remove_own_comments                   |  Toggle the bot's ability to remove it's own comments |
+|               | remove_comment_threshold              |  Toggle the comment score at which a comment is removed. Comments which score equal or below this value are removed. |
 |nlp            | match_store_threshold                 |  The NLP score threshold for comments which are stored, under `matches` in `records.json` |
 |               | quote_comment_length_delta            |  The maximum difference ratio between the length of a comments sentence and quote sentence to be compared. Quote / comment sentence ratios outside this range are discarded. |
 |               | minimum_comment_sentence_word_length  |  The minimum word length a comment needs to be in order to be compared with a quote. |

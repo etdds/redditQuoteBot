@@ -72,6 +72,8 @@ class CheckAllCredential(unittest.TestCase):
         config.bot.reply_to_comments = True
         config.bot.matched_quotes_to_log = 1
         config.bot.reply_threshold = 0.1
+        config.bot.remove_own_comments = False
+        config.bot.remove_comment_threshold = -10
         config.nlp.match_store_threshold = 0.2
         config.nlp.quote_comment_length_delta = 0.1
         config.nlp.minimum_comment_sentence_word_length = 2
@@ -96,6 +98,8 @@ class CheckAllCredential(unittest.TestCase):
         self.assertEqual(loaded.bot.reply_to_comments, True)
         self.assertEqual(loaded.bot.reply_threshold, 0.1)
         self.assertEqual(loaded.bot.matched_quotes_to_log, 1)
+        self.assertEqual(loaded.bot.remove_own_comments, False)
+        self.assertEqual(loaded.bot.remove_comment_threshold, -10)
         self.assertEqual(loaded.nlp.match_store_threshold, 0.2)
         self.assertEqual(loaded.nlp.quote_comment_length_delta, 0.1)
         self.assertEqual(loaded.nlp.minimum_comment_sentence_word_length, 2)
