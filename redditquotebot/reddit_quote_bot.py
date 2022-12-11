@@ -118,6 +118,25 @@ class RedditQuoteBot():
         records.log_reply(replies)
         return replies
 
+    def clean_own_comments(self):
+        if not self.configuration.bot.remove_own_comments:
+            return
+        username = self.credentials.reddit.username
+        user_comments = self.reddit.get_user_comments(username)
+        score_threshold = self.configuration.bot.remove_comment_threshold
+        comment_filter = CommentFilter(user_comments)
+        comment_filter.apply(lambda comment: CommentScoreFilter(comment) <= score_threshold)
+        pending_removal = comment_filter.result()
+        for comment in pending_removal:
+            try:
+                self.reddit.remove_comment(comment)
+                logger.info(f"Removing comment {comment.uid}, at {comment.url}, with score {comment.score}.")
+            except RedditUserAuthenticationError as exp:
+                logger.warning(f"Failed removing comment {comment.uid}, got authentication error. {exp}")
+            except Exception as exp:
+                logger.error(f"Got unexpected exception {exp} when removing comment: {comment.uid}")
+                raise exp
+
     def connect(self):
         """Connect (login) to reddit
         """
@@ -166,6 +185,7 @@ class RedditQuoteBot():
                     with DelayedKeyboardInterrupt():
                         self._save_records(records)
                         self._save_scrape_state(scrape_state)
+                self.clean_own_comments()
             except KeyboardInterrupt:
                 print()
                 sys.exit()
