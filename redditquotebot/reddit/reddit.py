@@ -1,4 +1,4 @@
-from redditquotebot.reddit import RedditConnectionError, RedditReplyError
+from redditquotebot.reddit import RedditConnectionError, RedditReplyError, RedditUserAuthenticationError
 from redditquotebot.utilities import Configuration, CredentialStore
 from redditquotebot.reddit import Comment, Reply
 from typing import List
@@ -78,6 +78,13 @@ class Reddit():
         for comment in redditor.comments.new(limit=None):
             comments.append(self._extract_comment(comment))
         return comments
+
+    def remove_comment(self, comment: Comment):
+        c = self._reddit.comment(comment.uid)
+        try:
+            c.delete()
+        except Forbidden as exc:
+            raise RedditUserAuthenticationError("Cannot remove comment, access denied.") from exc
 
     def reply_to_comment(self, comment: Comment, reply: Reply):
         """Post a reply to a comment.

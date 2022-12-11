@@ -15,3 +15,11 @@ class RedditReplyError(Exception):
 
     def __init__(self, message):
         super().__init__(message)
+
+
+class RedditUserAuthenticationError(Exception):
+    """Exception called when access to a user function results in a forbidden (403) exception.
+    """
+
+    def __init__(self, message):
+        super().__init__(message)
