@@ -151,6 +151,10 @@ class RedditQuoteBot():
 
         while (True):
             try:
+                comment_count = 0
+                match_count = 0
+                reply_count = 0
+                subreddit_timer = TimeDelta()
                 for subreddit in subreddits:
                     scrape_state = self._load_scrape_state()
                     records = self._load_records()
@@ -159,7 +163,6 @@ class RedditQuoteBot():
                         time.sleep(10)
                         continue
 
-                    subreddit_timer = TimeDelta()
                     try:
                         new_comments = self.get_latest_comments(subreddit, scrape_state, records)
                     except Exception as exp:
@@ -167,10 +170,7 @@ class RedditQuoteBot():
                         time.sleep(30)
                         continue
 
-                    comment_time = round(subreddit_timer.elapsed(), 2)
                     matches = self.get_matching_quotes(new_comments, records)
-                    match_time = round(subreddit_timer.elapsed(), 2)
-
                     threshold = self.configuration.bot.reply_threshold
                     try:
                         replies = self.reply_to_comments(matches, threshold, records)
@@ -180,17 +180,21 @@ class RedditQuoteBot():
                         records.add_banned_subreddit(subreddit)
                         replies = []
 
-                    reply_time = round(subreddit_timer.elapsed(), 2)
-                    logger.info(
-                        f"Subreddit {subreddit}: {len(new_comments)} comments in {comment_time}s, {len(matches)} matches in {match_time}s, {len(replies)} replies in {reply_time}s")
                     with DelayedKeyboardInterrupt():
                         self._save_records(records)
                         self._save_scrape_state(scrape_state)
+                    comment_count += len(new_comments)
+                    match_count += len(matches)
+                    reply_count += len(replies)
 
                 records = self._load_records()
                 self.clean_own_comments(records)
                 with DelayedKeyboardInterrupt():
                     self._save_records(records)
+
+                total_time = round(subreddit_timer.elapsed(), 2)
+                logger.info(
+                    f"Queried {len(subreddits)} subreddits. Found {comment_count} comments, {match_count} matches and, {reply_count} replies in {total_time}s.")
             except KeyboardInterrupt:
                 print()
                 sys.exit()
